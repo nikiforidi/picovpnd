@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"net"
+	"os/exec"
 
 	"github.com/anatolio-deb/picovpnd/common"
 	"github.com/sirupsen/logrus"
@@ -53,4 +54,13 @@ func handler(connection net.Conn) {
 	if err != nil {
 		logrus.Error(err)
 	}
+}
+
+func userAdd(username, password string) error {
+	b, err := exec.Command("echo", password, "|", "ocpasswd", "-c", "/etc/ocserv/ocpasswd", username).CombinedOutput()
+	if err != nil {
+		return err
+	}
+	logrus.Debug(b)
+	return nil
 }
