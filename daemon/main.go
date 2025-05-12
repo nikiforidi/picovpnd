@@ -2,9 +2,7 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"net"
-	"os/exec"
 
 	"github.com/anatolio-deb/picovpnd/common"
 	"github.com/sirupsen/logrus"
@@ -59,10 +57,5 @@ func handler(connection net.Conn) {
 }
 
 func userAdd(username, password string) error {
-	b, err := exec.Command(fmt.Sprintf("echo %s | ocpasswd", password), "-c", "/etc/ocserv/ocpasswd", username).CombinedOutput()
-	if err != nil {
-		return err
-	}
-	logrus.Debug(b)
-	return nil
+	return cryptInt("/etc/ocserv/ocpasswd", username, "", password)
 }
