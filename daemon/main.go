@@ -42,7 +42,7 @@ func handler(connection net.Conn) {
 		}
 	}
 	if err != nil {
-		resp.Code = 1
+		resp.Code++
 		resp.Error = err.Error()
 	}
 
