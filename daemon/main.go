@@ -54,6 +54,7 @@ func handler(connection net.Conn) {
 	if err != nil {
 		logrus.Error(err)
 	}
+	logrus.Debug("leaving handler")
 }
 
 func userAdd(username, password string) error {
