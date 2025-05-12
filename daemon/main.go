@@ -13,6 +13,8 @@ import (
 	"github.com/anatolio-deb/picovpnd/common"
 	"github.com/sirupsen/logrus"
 	cryptlib "github.com/tredoe/crypt"
+	md5 "github.com/tredoe/crypt/md5_crypt"
+	sha256 "github.com/tredoe/crypt/sha256_crypt"
 )
 
 const SALT_SIZE = 16
@@ -144,9 +146,9 @@ func crypt(passwd, salt string, algo cryptlib.Crypt) (string, error) {
 	var crypter cryptlib.Crypter
 	switch algo {
 	case cryptlib.SHA256:
-		crypter = cryptlib.SHA256.New()
+		crypter = sha256.New()
 	case cryptlib.MD5:
-		crypter = cryptlib.MD5.New()
+		crypter = md5.New()
 	}
 
 	ret, err := crypter.Generate([]byte(passwd), []byte(salt))
