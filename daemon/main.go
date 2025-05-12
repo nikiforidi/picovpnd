@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net"
 	"os/exec"
 
@@ -22,7 +23,7 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		handler(connection)
+		go handler(connection)
 	}
 }
 
@@ -58,7 +59,7 @@ func handler(connection net.Conn) {
 }
 
 func userAdd(username, password string) error {
-	b, err := exec.Command("echo", password, "|", "ocpasswd", "-c", "/etc/ocserv/ocpasswd", username).CombinedOutput()
+	b, err := exec.Command(fmt.Sprintf("echo %s | ocpasswd", password), "-c", "/etc/ocserv/ocpasswd", username).CombinedOutput()
 	if err != nil {
 		return err
 	}
