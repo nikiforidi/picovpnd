@@ -22,7 +22,7 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		go handler(connection)
+		handler(connection)
 	}
 }
 
