@@ -38,6 +38,7 @@ func handler(connection net.Conn) {
 		if err == nil {
 			err = common.UserAdd(req.Username, req.Password)
 		}
+		logrus.Infof("Request create user %s", req.Username)
 	}
 	if err != nil {
 		resp.Code = 1
