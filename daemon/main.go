@@ -36,9 +36,9 @@ func handler(connection net.Conn) {
 		req := common.AddUserRequest{}
 		err = json.Unmarshal(buffer[:mLen], &req)
 		if err == nil {
+			logrus.Infof("Request create user %s", req.Username)
 			err = common.UserAdd(req.Username, req.Password)
 		}
-		logrus.Infof("Request create user %s", req.Username)
 	}
 	if err != nil {
 		resp.Code = 1
