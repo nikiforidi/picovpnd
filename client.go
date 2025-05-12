@@ -1,14 +1,15 @@
-package main
+package picovpnd
 
 import (
 	"encoding/json"
 	"net"
 	"os"
 
+	"github.com/anatolio-deb/picovpnd/common"
 	"github.com/sirupsen/logrus"
 )
 
-func UserAdd(username, password string) Response {
+func UserAdd(username, password string) common.Response {
 	host := os.Getenv("DAEMON_HOST")
 	port := os.Getenv("DAEMON_PORT")
 	connection, err := net.Dial("unix", host+":"+port)
@@ -16,7 +17,7 @@ func UserAdd(username, password string) Response {
 		panic(err)
 	}
 	defer connection.Close()
-	request := AddUserRequest{
+	request := common.AddUserRequest{
 		Username: username,
 		Password: password,
 	}
@@ -33,7 +34,7 @@ func UserAdd(username, password string) Response {
 	if err != nil {
 		logrus.Error(err)
 	}
-	var resp Response
+	var resp common.Response
 	err = json.Unmarshal(buffer[:mLen], &resp)
 	if err != nil {
 		logrus.Error(err)

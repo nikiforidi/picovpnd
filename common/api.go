@@ -1,4 +1,4 @@
-package main
+package common
 
 import (
 	"os/exec"
@@ -16,7 +16,7 @@ type Response struct {
 	Error string `json:"error"`
 }
 
-func userAdd(username, password string) error {
+func UserAdd(username, password string) error {
 	b, err := exec.Command("echo", password, "|", "ocpasswd", "-c", "/etc/ocserv/ocpasswd", username).CombinedOutput()
 	if err != nil {
 		return err

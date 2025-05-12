@@ -1,10 +1,11 @@
-package main
+package daemon
 
 import (
 	"encoding/json"
 	"net"
 	"os"
 
+	"github.com/anatolio-deb/picovpnd/common"
 	"github.com/sirupsen/logrus"
 )
 
@@ -36,15 +37,15 @@ func main() {
 func handler(connection net.Conn) {
 	defer connection.Close()
 	var err error
-	resp := Response{}
+	resp := common.Response{}
 
 	buffer := make([]byte, 1024)
 	mLen, err := connection.Read(buffer)
 	if err == nil {
-		req := AddUserRequest{}
+		req := common.AddUserRequest{}
 		err = json.Unmarshal(buffer[:mLen], &req)
 		if err == nil {
-			err = userAdd(req.Username, req.Password)
+			err = common.UserAdd(req.Username, req.Password)
 		}
 	}
 	if err != nil {
