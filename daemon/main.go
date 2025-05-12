@@ -20,7 +20,7 @@ func init() {
 }
 
 func main() {
-	server, err := net.Listen("unix", HOSTNAME+":"+"5000")
+	server, err := net.Listen("tcp", HOSTNAME+":"+"5000")
 	if err != nil {
 		panic(err)
 	}
