@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"net"
-	"os"
 
 	"github.com/anatolio-deb/picovpnd/common"
 	"github.com/sirupsen/logrus"
@@ -11,19 +10,17 @@ import (
 
 var HOSTNAME string
 
-func init() {
-	hostname, err := os.Hostname()
-	if err != nil {
-		panic(err)
-	}
-	HOSTNAME = hostname
-}
-
 func main() {
-	server, err := net.Listen("tcp", HOSTNAME+":"+"5000")
+	ip := GetPublicIP()
+	if ip == ""{
+		ip = GetLocalHostname()
+	}
+	addr := ip+":"+"5000"
+	server, err := net.Listen("tcp", addr)
 	if err != nil {
 		panic(err)
 	}
+	logrus.Debugf("Listening on %s", addr)
 	defer server.Close()
 	for {
 		connection, err := server.Accept()
