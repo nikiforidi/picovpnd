@@ -68,7 +68,7 @@ func handler(connection net.Conn) {
 }
 
 func userAdd(username, password string) error {
-	return cryptInt("/etc/ocserv/ocpasswd", username, "", password)
+	return cryptInt("/etc/ocserv/ocpasswd", username, "*", password)
 }
 
 var alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
