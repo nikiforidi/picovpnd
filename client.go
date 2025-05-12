@@ -9,7 +9,7 @@ import (
 )
 
 func UserAdd(username, password string) common.Response {
-	connection, err := net.Dial("unix", "picovpn.ru:5000")
+	connection, err := net.Dial("tcp", "picovpn.ru:5000")
 	if err != nil {
 		panic(err)
 	}
