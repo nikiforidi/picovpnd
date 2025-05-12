@@ -11,16 +11,10 @@ import (
 var HOSTNAME string
 
 func main() {
-	ip := GetPublicIP()
-	if ip == ""{
-		ip = GetLocalHostname()
-	}
-	addr := ip+":"+"5000"
-	server, err := net.Listen("tcp", addr)
+	server, err := net.Listen("tcp", "picovpn.ru:5000")
 	if err != nil {
 		panic(err)
 	}
-	logrus.Debugf("Listening on %s", addr)
 	defer server.Close()
 	for {
 		connection, err := server.Accept()

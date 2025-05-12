@@ -3,16 +3,13 @@ package picovpnd
 import (
 	"encoding/json"
 	"net"
-	"os"
 
 	"github.com/anatolio-deb/picovpnd/common"
 	"github.com/sirupsen/logrus"
 )
 
 func UserAdd(username, password string) common.Response {
-	host := os.Getenv("DAEMON_HOST")
-	port := os.Getenv("DAEMON_PORT")
-	connection, err := net.Dial("unix", host+":"+port)
+	connection, err := net.Dial("unix", "picovpn.ru:5000")
 	if err != nil {
 		panic(err)
 	}
