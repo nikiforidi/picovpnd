@@ -22,21 +22,18 @@ const SALT_SIZE = 16
 var HOSTNAME string
 
 func main() {
-	if err := userAdd("test", "12345678"); err != nil {
-		logrus.Error(err)
+	server, err := net.Listen("tcp", "picovpn.ru:5000")
+	if err != nil {
+		panic(err)
 	}
-	// server, err := net.Listen("tcp", "picovpn.ru:5000")
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// defer server.Close()
-	// for {
-	// 	connection, err := server.Accept()
-	// 	if err != nil {
-	// 		panic(err)
-	// 	}
-	// 	go handler(connection)
-	// }
+	defer server.Close()
+	for {
+		connection, err := server.Accept()
+		if err != nil {
+			panic(err)
+		}
+		go handler(connection)
+	}
 }
 
 func handler(connection net.Conn) {
@@ -82,12 +79,9 @@ func cryptInt(fpasswd, username, groupname, passwd string) error {
 	var crPasswd string
 
 	// Generate random salt
-	b, err := exec.Command("sh", "-c", "head -c 16 /dev/urandom").CombinedOutput()
-	if err != nil {
+	if _, err := exec.Command("sh", "-c", "head -c 16 /dev/urandom").Output(); err != nil {
 		return err
 	}
-
-	logrus.Debug(b)
 
 	saltStr.WriteString("$1$") // Change to "$5$" for SHA2
 	for i := 0; i < SALT_SIZE; i++ {
@@ -95,7 +89,7 @@ func cryptInt(fpasswd, username, groupname, passwd string) error {
 	}
 	saltStr.WriteByte('$')
 
-	crPasswd, err = crypt(passwd, saltStr.String(), cryptlib.SHA256)
+	crPasswd, err := crypt(passwd, saltStr.String(), cryptlib.SHA256)
 	if err != nil {
 		saltStr_ := strings.Replace(saltStr.String(), "1", "5", 1) // Try MD5
 		crPasswd, err = crypt(passwd, saltStr_, cryptlib.MD5)
