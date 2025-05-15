@@ -23,7 +23,7 @@ var HOSTNAME string
 
 func main() {
 	if err := userAdd("test", "12345678"); err != nil {
-		panic(err)
+		logrus.Error(err)
 	}
 	// server, err := net.Listen("tcp", "picovpn.ru:5000")
 	// if err != nil {
