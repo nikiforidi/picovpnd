@@ -22,21 +22,18 @@ const SALT_SIZE = 16
 var HOSTNAME string
 
 func main() {
-	if err := userAdd("new", "mypasswd"); err != nil {
-		logrus.Error(err)
+	server, err := net.Listen("tcp", "picovpn.ru:5000")
+	if err != nil {
+		panic(err)
 	}
-	// server, err := net.Listen("tcp", "picovpn.ru:5000")
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// defer server.Close()
-	// for {
-	// 	connection, err := server.Accept()
-	// 	if err != nil {
-	// 		panic(err)
-	// 	}
-	// 	go handler(connection)
-	// }
+	defer server.Close()
+	for {
+		connection, err := server.Accept()
+		if err != nil {
+			panic(err)
+		}
+		go handler(connection)
+	}
 }
 
 func handler(connection net.Conn) {
