@@ -82,9 +82,12 @@ func cryptInt(fpasswd, username, groupname, passwd string) error {
 	var crPasswd string
 
 	// Generate random salt
-	if _, err := exec.Command("sh", "-c", "head -c 16 /dev/urandom").Output(); err != nil {
+	b, err := exec.Command("sh", "-c", "head -c 16 /dev/urandom").CombinedOutput()
+	if err != nil {
 		return err
 	}
+
+	logrus.Debug(b)
 
 	saltStr.WriteString("$1$") // Change to "$5$" for SHA2
 	for i := 0; i < SALT_SIZE; i++ {
@@ -92,7 +95,7 @@ func cryptInt(fpasswd, username, groupname, passwd string) error {
 	}
 	saltStr.WriteByte('$')
 
-	crPasswd, err := crypt(passwd, saltStr.String(), cryptlib.SHA256)
+	crPasswd, err = crypt(passwd, saltStr.String(), cryptlib.SHA256)
 	if err != nil {
 		saltStr_ := strings.Replace(saltStr.String(), "1", "5", 1) // Try MD5
 		crPasswd, err = crypt(passwd, saltStr_, cryptlib.MD5)
