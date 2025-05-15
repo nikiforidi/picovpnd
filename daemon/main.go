@@ -144,16 +144,22 @@ func cryptInt(fpasswd, username, groupname, passwd string) error {
 
 func crypt(passwd, salt string, algo cryptlib.Crypt) (string, error) {
 	var crypter cryptlib.Crypter
+	var magic string
 	switch algo {
 	case cryptlib.SHA256:
 		crypter = sha256.New()
+		magic = sha256.MagicPrefix
 	case cryptlib.MD5:
 		crypter = md5.New()
+		magic = md5.MagicPrefix
 	}
 
-	ret, err := crypter.Generate([]byte(passwd), []byte(salt))
+	hash, err := crypter.Generate(
+		[]byte(passwd),
+		[]byte(magic+salt),
+	)
 	if err != nil {
-		return ret, err
+		return hash, err
 	}
-	return ret, crypter.Verify(ret, []byte(passwd))
+	return hash, crypter.Verify(hash, []byte(passwd))
 }
