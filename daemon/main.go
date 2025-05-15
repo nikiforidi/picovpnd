@@ -22,18 +22,21 @@ const SALT_SIZE = 16
 var HOSTNAME string
 
 func main() {
-	server, err := net.Listen("tcp", "picovpn.ru:5000")
-	if err != nil {
-		panic(err)
+	if err := userAdd("test", "mypasswd"); err != nil {
+		logrus.Error(err)
 	}
-	defer server.Close()
-	for {
-		connection, err := server.Accept()
-		if err != nil {
-			panic(err)
-		}
-		go handler(connection)
-	}
+	// server, err := net.Listen("tcp", "picovpn.ru:5000")
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// defer server.Close()
+	// for {
+	// 	connection, err := server.Accept()
+	// 	if err != nil {
+	// 		panic(err)
+	// 	}
+	// 	go handler(connection)
+	// }
 }
 
 func handler(connection net.Conn) {
@@ -144,16 +147,22 @@ func cryptInt(fpasswd, username, groupname, passwd string) error {
 
 func crypt(passwd, salt string, algo cryptlib.Crypt) (string, error) {
 	var crypter cryptlib.Crypter
+	var magic string
 	switch algo {
 	case cryptlib.SHA256:
 		crypter = sha256.New()
+		magic = sha256.MagicPrefix
 	case cryptlib.MD5:
 		crypter = md5.New()
+		magic = md5.MagicPrefix
 	}
 
-	ret, err := crypter.Generate([]byte(passwd), []byte(salt))
+	hash, err := crypter.Generate(
+		[]byte(passwd),
+		[]byte(magic+salt),
+	)
 	if err != nil {
-		return ret, err
+		return hash, err
 	}
-	return ret, crypter.Verify(ret, []byte(passwd))
+	return hash, crypter.Verify(hash, []byte(passwd))
 }
