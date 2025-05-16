@@ -7,15 +7,15 @@ import (
 	"github.com/anatolio-deb/picovpnd/common"
 )
 
-type Client struct {
+type client struct {
 	Network string // TCP
 	Address string // addr:port
 	conn    net.Conn
 	resp    common.Response
 }
 
-func New(network, address string) (Client, error) {
-	c := Client{Network: network, Address: address, resp: common.Response{}}
+func New(network, address string) (client, error) {
+	c := client{Network: network, Address: address, resp: common.Response{}}
 	conn, err := net.Dial("tcp", "picovpn.ru:5000")
 	if err != nil {
 		return c, err
@@ -24,7 +24,7 @@ func New(network, address string) (Client, error) {
 	return c, err
 }
 
-func (c Client) Send(req common.Request) common.Response {
+func (c client) Send(req common.Request) common.Response {
 	b, err := json.Marshal(req)
 	if err != nil {
 		c.resp.Error = err.Error()
@@ -53,7 +53,7 @@ func (c Client) Send(req common.Request) common.Response {
 	return c.resp
 }
 
-func (c Client) UserAdd(username, password string) common.Response {
+func (c client) UserAdd(username, password string) common.Response {
 	defer c.conn.Close()
 	// resp := common.Response{}
 	payload := common.UserAddPayload{
@@ -67,7 +67,7 @@ func (c Client) UserAdd(username, password string) common.Response {
 	return c.Send(request)
 }
 
-func (c Client) UserLock(username string) common.Response {
+func (c client) UserLock(username string) common.Response {
 	defer c.conn.Close()
 	payload := common.UserMixin{
 		Username: username,
