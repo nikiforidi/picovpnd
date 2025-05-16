@@ -5,13 +5,15 @@ import (
 	"net"
 
 	"github.com/anatolio-deb/picovpnd/common"
-	"github.com/sirupsen/logrus"
 )
 
 func UserAdd(username, password string) common.Response {
+	resp := common.Response{}
 	connection, err := net.Dial("tcp", "picovpn.ru:5000")
 	if err != nil {
-		panic(err)
+		resp.Error = err.Error()
+		resp.Code++
+		return resp
 	}
 	defer connection.Close()
 	request := common.AddUserRequest{
@@ -20,21 +22,28 @@ func UserAdd(username, password string) common.Response {
 	}
 	b, err := json.Marshal(request)
 	if err != nil {
-		logrus.Error(err)
+		resp.Error = err.Error()
+		resp.Code++
+		return resp
 	}
 	_, err = connection.Write(b)
 	if err != nil {
-		logrus.Error(err)
+		resp.Error = err.Error()
+		resp.Code++
+		return resp
 	}
 	buffer := make([]byte, 1024)
 	mLen, err := connection.Read(buffer)
 	if err != nil {
-		logrus.Error(err)
+		resp.Error = err.Error()
+		resp.Code++
+		return resp
 	}
-	var resp common.Response
 	err = json.Unmarshal(buffer[:mLen], &resp)
 	if err != nil {
-		logrus.Error(err)
+		resp.Error = err.Error()
+		resp.Code++
+		return resp
 	}
 	return resp
 }
