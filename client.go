@@ -18,7 +18,7 @@ type client struct {
 	resp    common.Response
 }
 
-func New(network, address string) (*client, error) {
+func New(address string) (*client, error) {
 	cert, err := os.ReadFile(common.CertificateFile)
 	if err != nil {
 		return nil, err
