@@ -12,7 +12,6 @@ import (
 )
 
 type client struct {
-	Network string // TCP
 	Address string // addr:port
 	conn    net.Conn
 	resp    common.Response
@@ -33,7 +32,7 @@ func New(address string) (*client, error) {
 	if err != nil {
 		return nil, err
 	}
-	c := client{Network: network, Address: address, resp: common.Response{}, conn: conn}
+	c := client{Address: address, resp: common.Response{}, conn: conn}
 	return &c, err
 }
 
