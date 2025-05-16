@@ -4,7 +4,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
-	"log"
+	"fmt"
 	"net"
 	"os"
 
@@ -18,23 +18,23 @@ type client struct {
 	resp    common.Response
 }
 
-func New(network, address string) (client, error) {
+func New(network, address string) (*client, error) {
 	cert, err := os.ReadFile(common.CertificateFile)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	certPool := x509.NewCertPool()
 	if ok := certPool.AppendCertsFromPEM(cert); !ok {
-		log.Fatalf("unable to parse cert from %s", common.CertificateFile)
+		return nil, fmt.Errorf("unable to parse cert from %s", common.CertificateFile)
 	}
 	config := &tls.Config{RootCAs: certPool}
 
 	conn, err := tls.Dial("tcp", common.ListenAddress, config)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	c := client{Network: network, Address: address, resp: common.Response{}, conn: conn}
-	return c, err
+	return &c, err
 }
 
 func (c client) Send(req common.Request) common.Response {
