@@ -10,9 +10,11 @@ import (
 type Method string
 
 const (
-	UserAdd    = Method("user_add")
-	UserLock   = Method("user_lock")
-	UserUnlock = Method("user_unlock")
+	CertificateFile = "/etc/letsencrypt/live/picovpn.ru/fullchain.pem"
+	ListenAddress   = "picovpn.ru:5000"
+	UserAdd         = Method("user_add")
+	UserLock        = Method("user_lock")
+	UserUnlock      = Method("user_unlock")
 )
 
 type Request struct {

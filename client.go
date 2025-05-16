@@ -1,8 +1,12 @@
 package picovpnd
 
 import (
+	"crypto/tls"
+	"crypto/x509"
 	"encoding/json"
+	"log"
 	"net"
+	"os"
 
 	"github.com/anatolio-deb/picovpnd/common"
 )
@@ -15,12 +19,21 @@ type client struct {
 }
 
 func New(network, address string) (client, error) {
-	c := client{Network: network, Address: address, resp: common.Response{}}
-	conn, err := net.Dial("tcp", "picovpn.ru:5000")
+	cert, err := os.ReadFile(common.CertificateFile)
 	if err != nil {
-		return c, err
+		log.Fatal(err)
 	}
-	c.conn = conn
+	certPool := x509.NewCertPool()
+	if ok := certPool.AppendCertsFromPEM(cert); !ok {
+		log.Fatalf("unable to parse cert from %s", common.CertificateFile)
+	}
+	config := &tls.Config{RootCAs: certPool}
+
+	conn, err := tls.Dial("tcp", common.ListenAddress, config)
+	if err != nil {
+		log.Fatal(err)
+	}
+	c := client{Network: network, Address: address, resp: common.Response{}, conn: conn}
 	return c, err
 }
 

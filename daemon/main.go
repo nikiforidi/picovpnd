@@ -1,7 +1,9 @@
 package main
 
 import (
+	"crypto/tls"
 	"encoding/json"
+	"log"
 	"net"
 
 	"github.com/anatolio-deb/picovpnd/common"
@@ -9,18 +11,27 @@ import (
 )
 
 func main() {
-	server, err := net.Listen("tcp", "picovpn.ru:5000")
+	cert, err := tls.LoadX509KeyPair(common.CertificateFile, "/etc/letsencrypt/live/picovpn.ru/privkey.pem")
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
-	defer server.Close()
+	config := &tls.Config{Certificates: []tls.Certificate{cert}}
+	l, err := tls.Listen("tcp", common.ListenAddress, config)
+	if err != nil {
+		logrus.Fatal(err)
+	}
+	defer l.Close()
+
 	for {
-		connection, err := server.Accept()
+		conn, err := l.Accept()
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
-		go handler(connection)
+		log.Printf("accepted connection from %s\n", conn.RemoteAddr())
+
+		go handler(conn)
 	}
+
 }
 
 func handler(connection net.Conn) {
