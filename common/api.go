@@ -49,6 +49,7 @@ type UserAddPayload struct {
 // }
 
 func PayloadDispatcher(req Request) error {
+	logrus.Infof("Dispatching %s request", req.Method)
 	switch req.Method {
 	case UserAdd:
 		p, ok := req.Payload.(UserAddPayload)
