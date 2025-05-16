@@ -19,7 +19,7 @@ func UserAdd(username, password string) error {
 	}
 	defer c.Close()
 
-	cmd := exec.Command("ocpasswd", "-c", "/etc/ocserv/ocpasswd")
+	cmd := exec.Command("ocpasswd", "-c", "/etc/ocserv/ocpasswd", username)
 	cmd.Stdin = c.Tty()
 	cmd.Stdout = c.Tty()
 	cmd.Stderr = c.Tty()
