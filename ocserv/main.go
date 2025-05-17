@@ -36,7 +36,7 @@ func UserAdd(username, password string) error {
 	}
 
 	time.Sleep(time.Second)
-	c.Send(fmt.Sprintf("%s", password))
+	c.Send(fmt.Sprintf("%s\x1b", password))
 	keyboard.SimulateKeyPress(keys.Enter)
 	time.Sleep(time.Second)
 	c.Send(fmt.Sprintf("%s\x1b", password))
