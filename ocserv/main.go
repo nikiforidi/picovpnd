@@ -6,6 +6,8 @@ import (
 	"os/exec"
 	"time"
 
+	"atomicgo.dev/keyboard"
+	"atomicgo.dev/keyboard/keys"
 	expect "github.com/Netflix/go-expect"
 	"github.com/sirupsen/logrus"
 )
@@ -34,9 +36,11 @@ func UserAdd(username, password string) error {
 	}
 
 	time.Sleep(time.Second)
-	c.Send(fmt.Sprintf("%s\x1b", password))
+	c.Send(fmt.Sprintf("%s", password))
+	keyboard.SimulateKeyPress(keys.Enter)
 	time.Sleep(time.Second)
 	c.Send(fmt.Sprintf("%s\x1b", password))
+	keyboard.SimulateKeyPress(keys.Enter)
 
 	return cmd.Wait()
 }
