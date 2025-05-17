@@ -1,7 +1,6 @@
 package ocserv
 
 import (
-	"fmt"
 	"os"
 	"os/exec"
 	"time"
@@ -36,10 +35,10 @@ func UserAdd(username, password string) error {
 	}
 
 	time.Sleep(time.Second)
-	c.Send(fmt.Sprintf("%s\x1b", password))
+	c.Send(password)
 	keyboard.SimulateKeyPress(keys.Enter)
 	time.Sleep(time.Second)
-	c.Send(fmt.Sprintf("%s\x1b", password))
+	c.Send(password)
 	keyboard.SimulateKeyPress(keys.Enter)
 
 	return cmd.Wait()
