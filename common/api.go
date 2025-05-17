@@ -53,13 +53,9 @@ func PayloadDispatcher(req Request) error {
 	logrus.Infof("Dispatching %s request", req.Method)
 	switch req.Method {
 	case UserAdd:
-		p, ok := req.Payload.(UserAddPayload)
-		if ok {
-			logrus.Infof("Request create user %s", p.Username)
-			return ocserv.UserAdd(p.Username, p.Password)
-		} else {
-			return fmt.Errorf("bad request: %s", req.Method)
-		}
+		p := req.Payload.(UserAddPayload)
+		logrus.Infof("Request create user %s", p.Username)
+		return ocserv.UserAdd(p.Username, p.Password)
 	case UserLock:
 		p, ok := req.Payload.(UserMixin)
 		if ok {
