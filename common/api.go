@@ -56,6 +56,8 @@ func PayloadDispatcher(req Request) error {
 		if ok {
 			logrus.Infof("Request create user %s", p.Username)
 			return ocserv.UserAdd(p.Username, p.Password)
+		} else {
+			logrus.Debug("Wrong request type")
 		}
 	case UserLock:
 		p, ok := req.Payload.(UserMixin)
