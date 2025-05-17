@@ -41,19 +41,22 @@ func handler(connection net.Conn) {
 
 	buffer := make([]byte, 1024)
 	mLen, err := connection.Read(buffer)
-	if err == nil {
-		req := common.Request{}
-		err = json.Unmarshal(buffer[:mLen], &req)
-		if err == nil {
-			err := common.PayloadDispatcher(req)
-			if err != nil {
-				logrus.Error(err)
-			}
-		}
-	}
 	if err != nil {
 		resp.Code++
 		resp.Error = err.Error()
+	} else {
+		req := common.Request{}
+		err = json.Unmarshal(buffer[:mLen], &req)
+		if err != nil {
+			resp.Code++
+			resp.Error = err.Error()
+		} else {
+			err = common.PayloadDispatcher(req)
+			if err != nil {
+				resp.Code++
+				resp.Error = err.Error()
+			}
+		}
 	}
 
 	b, err := json.Marshal(resp)
