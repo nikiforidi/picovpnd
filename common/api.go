@@ -70,7 +70,7 @@ func PayloadDispatcher(req Request) error {
 			return ocserv.UserUnlock(p.Username)
 		}
 	default:
-		logrus.Debug("Bad request")
+		logrus.Info("Bad request")
 	}
 	return nil
 }
