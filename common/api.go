@@ -2,6 +2,7 @@ package common
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/anatolio-deb/picovpnd/ocserv"
 	"github.com/sirupsen/logrus"
@@ -56,21 +57,27 @@ func PayloadDispatcher(req Request) error {
 		if ok {
 			logrus.Infof("Request create user %s", p.Username)
 			return ocserv.UserAdd(p.Username, p.Password)
+		} else {
+			return fmt.Errorf("bad request: %s", req.Method)
 		}
 	case UserLock:
 		p, ok := req.Payload.(UserMixin)
 		if ok {
 			logrus.Infof("Request lock user %s", p.Username)
 			return ocserv.UserLock(p.Username)
+		} else {
+			return fmt.Errorf("bad request: %s", req.Method)
 		}
 	case UserUnlock:
 		p, ok := req.Payload.(UserMixin)
 		if ok {
 			logrus.Infof("Request unlock user %s", p.Username)
 			return ocserv.UserUnlock(p.Username)
+		} else {
+			return fmt.Errorf("bad request: %s", req.Method)
 		}
 	default:
-		logrus.Info("Bad request")
+		return fmt.Errorf("bad request: %s", req.Method)
 	}
 	return nil
 }
