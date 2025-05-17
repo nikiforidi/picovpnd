@@ -68,25 +68,30 @@ func (c client) Send(req common.Request) common.Response {
 func (c client) UserAdd(username, password string) common.Response {
 	defer c.conn.Close()
 	// resp := common.Response{}
-	payload := common.UserAddPayload{
-		UserMixin: common.UserMixin{Username: username},
-		Password:  password,
-	}
+	// payload := common.UserAddPayload{
+	// 	UserMixin: common.UserMixin{Username: username},
+	// 	Password:  password,
+	// }
 	request := common.Request{
-		Method:  common.UserAdd,
-		Payload: payload,
+		Method: common.UserAdd,
+		Payload: map[string]string{
+			"username": username,
+			"password": password,
+		},
 	}
 	return c.Send(request)
 }
 
 func (c client) UserLock(username string) common.Response {
 	defer c.conn.Close()
-	payload := common.UserMixin{
-		Username: username,
-	}
+	// payload := common.UserMixin{
+	// 	Username: username,
+	// }
 	request := common.Request{
-		Method:  common.UserLock,
-		Payload: payload,
+		Method: common.UserLock,
+		Payload: map[string]string{
+			"username": username,
+		},
 	}
 	return c.Send(request)
 }
