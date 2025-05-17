@@ -1,30 +1,46 @@
 package ocserv
 
 import (
+	"fmt"
+	"os"
 	"os/exec"
 	"time"
 
-	"atomicgo.dev/keyboard"
-	"atomicgo.dev/keyboard/keys"
+	expect "github.com/Netflix/go-expect"
 	"github.com/sirupsen/logrus"
 )
 
 // ocpasswd -c /etc/ocserv/ocpasswd username
 func UserAdd(username, password string) error {
 	// return cryptInt("/etc/ocserv/ocpasswd", username, "*", password)
-	cmd := exec.Command("ocpasswd", "-c", "/etc/ocserv/ocpasswd", username)
+	c, err := expect.NewConsole(expect.WithStdout(os.Stdout))
+	if err != nil {
+		return err
+	}
+	defer c.Close()
 
-	err := cmd.Start()
+	cmd := exec.Command("ocpasswd", "-c", "/etc/ocserv/ocpasswd", username)
+	cmd.Stdin = c.Tty()
+	cmd.Stdout = c.Tty()
+	cmd.Stderr = c.Tty()
+
+	go func() {
+		c.ExpectEOF()
+	}()
+
+	err = cmd.Start()
 	if err != nil {
 		return err
 	}
 
 	time.Sleep(time.Second)
-	keyboard.SimulateKeyPress(password)
-	keyboard.SimulateKeyPress(keys.Enter)
+	c.Send(fmt.Sprintf(`%s
+	
+	`, password))
 	time.Sleep(time.Second)
-	keyboard.SimulateKeyPress(password)
-	keyboard.SimulateKeyPress(keys.Enter)
+	c.Send(fmt.Sprintf(`%s
+	
+	`, password))
 
 	return cmd.Wait()
 }
