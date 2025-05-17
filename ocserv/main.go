@@ -1,7 +1,6 @@
 package ocserv
 
 import (
-	"fmt"
 	"os"
 	"os/exec"
 	"time"
@@ -24,23 +23,24 @@ func UserAdd(username, password string) error {
 	cmd.Stdout = c.Tty()
 	cmd.Stderr = c.Tty()
 
-	go func() {
-		c.ExpectEOF()
-	}()
-
 	err = cmd.Start()
 	if err != nil {
 		return err
 	}
 
+	go func() {
+		c.ExpectString("Enter password:")
+	}()
+
 	time.Sleep(time.Second)
-	c.Send(fmt.Sprintf(`%s
-	
-	`, password))
+	c.SendLine(password)
+
+	go func() {
+		c.ExpectString("Re-enter password:")
+	}()
+
 	time.Sleep(time.Second)
-	c.Send(fmt.Sprintf(`%s
-	
-	`, password))
+	c.SendLine(password)
 
 	return cmd.Wait()
 }
