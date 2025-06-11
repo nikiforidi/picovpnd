@@ -6,7 +6,11 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"os"
+	"os/exec"
+	"time"
 
+	"github.com/Netflix/go-expect"
 	pb "github.com/anatolio-deb/picovpnd/picovpnd"
 	"google.golang.org/grpc"
 )
@@ -22,6 +26,37 @@ type server struct {
 
 // SayHello implements helloworld.GreeterServer
 func (s *server) UserAdd(context.Context, *pb.UserAddRequest) (*pb.Response, error) {
+	c, err := expect.NewConsole(expect.WithStdout(os.Stdout))
+	if err != nil {
+		return err
+	}
+	defer c.Close()
+
+	cmd := exec.Command("ocpasswd", "-c", "/etc/ocserv/passwd", username)
+	cmd.Stdin = c.Tty()
+	cmd.Stdout = c.Tty()
+	cmd.Stderr = c.Tty()
+
+	err = cmd.Start()
+	if err != nil {
+		return err
+	}
+
+	go func() {
+		c.ExpectString("Enter password:")
+	}()
+
+	time.Sleep(time.Second)
+	c.SendLine(password)
+
+	go func() {
+		c.ExpectString("Re-enter password:")
+	}()
+
+	time.Sleep(time.Second)
+	c.SendLine(password)
+
+	return cmd.Wait()
 }
 
 func (s *server) UserLock(context.Context, *pb.UserLockRequest) (*pb.Response, error) {
