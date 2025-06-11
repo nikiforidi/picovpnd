@@ -37,4 +37,4 @@ jobs:
         with:
           files: picovpnd_*.deb
         env:
-          GITHUB_TOKEN: ${{ secrets.PICOVPN_CI }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
