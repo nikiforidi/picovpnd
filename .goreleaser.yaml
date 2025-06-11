@@ -12,8 +12,6 @@ before:
   hooks:
     # You may remove this if you don't use go modules.
     - go mod tidy
-    # you may remove this if you don't need go generate
-    - go generate ./...
 
 builds:
   - env:
@@ -24,20 +22,25 @@ builds:
       - amd64
 
 nfpms:
+  -
+    file_name_template: "{{ .PackageName }}_{{ .Os }}_{{ .Arch }}"
+    vendor: PicoVPN
+    homepage: https://picovpn.ru/
+    maintainer: Anatolio Nikiforidis <nikiforova693@gmail.com>
+    description: |-
+      Fast, secure, and modern VPN.
+    license: MIT
     formats:
+      # - apk
       - deb
-
-
-# changelog:
-#   sort: asc
-#   filters:
-#     exclude:
-#       - "^docs:"
-#       - "^test:"
-
-# release:
-  # footer: >-
-
-  #   ---
-
-  #   Released by [GoReleaser](https://github.com/goreleaser/goreleaser).
+      # - rpm
+    dependencies:
+      # - wireguard-tools
+      # - openresolv
+    bindir: /usr/local/bin
+    # Version Release.
+    release: 1
+    # Section.
+    section: default
+    # Priority.
+    priority: extra
