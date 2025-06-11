@@ -9,7 +9,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// ocpasswd -c /etc/ocserv/ocpasswd username
 func UserAdd(username, password string) error {
 	// return cryptInt("/etc/ocserv/ocpasswd", username, "*", password)
 	c, err := expect.NewConsole(expect.WithStdout(os.Stdout))

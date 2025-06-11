@@ -1,4 +1,4 @@
-package picovpnd
+package client
 
 import (
 	"crypto/tls"

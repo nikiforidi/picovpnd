@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package grpc;
+
+service UserService {
+  rpc AddUser (AddUserRequest) returns (UserResponse);
+  rpc LockUser (LockUserRequest) returns (UserResponse);
+  rpc UnlockUser (LockUserRequest) returns (UserResponse);
+}
+
+message AddUserRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message LockUserRequest {
+  string username = 1;
+}
+
+message UserResponse {
+  int32 code = 1;
+  string error = 2;
+}

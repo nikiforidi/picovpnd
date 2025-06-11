@@ -8,6 +8,10 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      AUTOCERT_DOMAIN: ${{ env.AUTOCERT_DOMAIN }}
+      AUTOCERT_DIR: ${{ env.AUTOCERT_DIR }}
+      REST_URL: ${{ env.REST_URL }}
 
     steps:
       - name: Checkout code

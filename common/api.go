@@ -84,7 +84,6 @@ func PayloadDispatcher(req Request) error {
 	default:
 		return fmt.Errorf("bad request: %s", req.Method)
 	}
-	return nil
 }
 
 type Response struct {

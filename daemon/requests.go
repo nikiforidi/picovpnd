@@ -1,4 +1,4 @@
-package main
+package daemon
 
 type Report struct {
 	PublicIP   string `json:"publicIP"`
