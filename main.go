@@ -2,8 +2,6 @@ package main
 
 import (
 	"context"
-	"crypto/tls"
-	"flag"
 	"fmt"
 	"log"
 	"net"
@@ -13,7 +11,6 @@ import (
 
 	"github.com/Netflix/go-expect"
 	pb "github.com/anatolio-deb/picovpnd/picovpnd"
-	"golang.org/x/crypto/acme/autocert"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )
@@ -87,30 +84,18 @@ func (s *server) UserChangePassword(context.Context, *pb.UserChangePasswordReque
 	}, fmt.Errorf("not implemented")
 }
 
+// https://github.com/grpc/grpc-go/blob/master/examples/features/encryption/TLS/server/main.go
 func main() {
-	certManager := autocert.Manager{
-		Prompt:     autocert.AcceptTOS,
-		HostPolicy: autocert.HostWhitelist(os.Getenv("AUTOCERT_DOMAIN")), // Use your email or domain here
-		Cache:      autocert.DirCache(os.Getenv("AUTOCERT_DIR")),         // Directory to cache certificates
-	}
-
-	flag.Parse()
-
-	lis, err := net.Listen("tcp", ":0") // Listen on a random port
+	lis, err := net.Listen("tcp", ":0") // Use ":0" to let the OS choose a free port
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
 	// Create tls based credential.
-	cert, err := certManager.GetCertificate(&tls.ClientHelloInfo{
-		ServerName: os.Getenv("AUTOCERT_DOMAIN"),
-	})
-
-	if err != nil {
-		log.Fatalf("failed to get certificate: %v", err)
-	}
-	// Create credentials from the certificate.
-	creds := credentials.NewServerTLSFromCert(cert)
+	creds, err := credentials.NewServerTLSFromFile(
+		"/etc/letsencrypt/live/picovpn.ru/fullchain.pem",
+		"/etc/letsencrypt/live/picovpn.ru/privkey.pem",
+	)
 	if err != nil {
 		log.Fatalf("failed to create credentials: %v", err)
 	}
