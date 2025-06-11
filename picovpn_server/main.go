@@ -69,10 +69,11 @@ func (s *server) UserLock(_ context.Context, req *pb.UserLockRequest) (*pb.Respo
 	}, err
 }
 
-func (s *server) UserUnlock(context.Context, *pb.UserUnlockRequest) (*pb.Response, error) {
+func (s *server) UserUnlock(_ context.Context, req *pb.UserUnlockRequest) (*pb.Response, error) {
+	b, err := exec.Command("ocpasswd", "--unlock", req.Username).CombinedOutput()
 	return &pb.Response{
-		Error: "Not implemented",
-	}, fmt.Errorf("not implemented")
+		Error: string(b),
+	}, err
 }
 
 func (s *server) UserDelete(context.Context, *pb.UserDeleteRequest) (*pb.Response, error) {
