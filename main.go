@@ -86,7 +86,7 @@ func (s *server) UserChangePassword(context.Context, *pb.UserChangePasswordReque
 
 // https://github.com/grpc/grpc-go/blob/master/examples/features/encryption/TLS/server/main.go
 func main() {
-	lis, err := net.Listen("tcp", ":0") // Use ":0" to let the OS choose a free port
+	lis, err := net.Listen("tcp", ":50051")
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
