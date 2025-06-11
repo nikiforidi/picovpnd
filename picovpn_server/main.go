@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
 	"flag"
 	"fmt"
 	"log"
@@ -12,6 +13,7 @@ import (
 
 	"github.com/Netflix/go-expect"
 	pb "github.com/anatolio-deb/picovpnd/picovpnd"
+	"golang.org/x/crypto/acme/autocert"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )
@@ -107,6 +109,13 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
+
+	certManager := autocert.Manager{
+		Prompt:     autocert.AcceptTOS,
+		HostPolicy: autocert.HostWhitelist(os.Getenv("AUTOCERT_DOMAIN")), // Use your email or domain here
+		Cache:      autocert.DirCache(os.Getenv("AUTOCERT_DIR")),         // Directory to cache certificates
+	}
+	config := &tls.Config{GetCertificate: certManager.GetCertificate, MinVersion: tls.VersionTLS12}
 
 	// Create tls based credential.
 	creds, err := credentials.NewServerTLSFromCert()
