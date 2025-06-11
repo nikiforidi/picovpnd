@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net"
-	"os"
 
 	"github.com/anatolio-deb/picovpnd/common"
 )
@@ -17,18 +16,18 @@ type client struct {
 	resp    common.Response
 }
 
-func New(address string) (*client, error) {
-	cert, err := os.ReadFile(common.CertificateFile)
-	if err != nil {
-		return nil, err
-	}
+func New(address string, port int, cert []byte) (*client, error) {
+	// cert, err := os.ReadFile(common.CertificateFile)
+	// if err != nil {
+	// 	return nil, err
+	// }
 	certPool := x509.NewCertPool()
 	if ok := certPool.AppendCertsFromPEM(cert); !ok {
-		return nil, fmt.Errorf("unable to parse cert from %s", common.CertificateFile)
+		return nil, fmt.Errorf("unable to parse cert from %s", cert)
 	}
 	config := &tls.Config{RootCAs: certPool}
 
-	conn, err := tls.Dial("tcp", common.ListenAddress, config)
+	conn, err := tls.Dial("tcp", fmt.Sprintf(address, ":", port), config)
 	if err != nil {
 		return nil, err
 	}
