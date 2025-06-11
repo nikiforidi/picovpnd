@@ -25,21 +25,21 @@ type server struct {
 }
 
 // SayHello implements helloworld.GreeterServer
-func (s *server) UserAdd(context.Context, *pb.UserAddRequest) (*pb.Response, error) {
+func (s *server) UserAdd(_ context.Context, req *pb.UserAddRequest) (*pb.Response, error) {
 	c, err := expect.NewConsole(expect.WithStdout(os.Stdout))
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer c.Close()
 
-	cmd := exec.Command("ocpasswd", "-c", "/etc/ocserv/passwd", username)
+	cmd := exec.Command("ocpasswd", "-c", "/etc/ocserv/passwd", req.Username)
 	cmd.Stdin = c.Tty()
 	cmd.Stdout = c.Tty()
 	cmd.Stderr = c.Tty()
 
 	err = cmd.Start()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	go func() {
@@ -47,28 +47,44 @@ func (s *server) UserAdd(context.Context, *pb.UserAddRequest) (*pb.Response, err
 	}()
 
 	time.Sleep(time.Second)
-	c.SendLine(password)
+	c.SendLine(req.Password)
 
 	go func() {
 		c.ExpectString("Re-enter password:")
 	}()
 
 	time.Sleep(time.Second)
-	c.SendLine(password)
+	c.SendLine(req.Password)
 
-	return cmd.Wait()
+	err = cmd.Wait()
+	return &pb.Response{
+		Error: err.Error(),
+	}, err
 }
 
 func (s *server) UserLock(context.Context, *pb.UserLockRequest) (*pb.Response, error) {
+	return &pb.Response{
+		Error: "Not implemented",
+	}, fmt.Errorf("not implemented")
+
 }
 
 func (s *server) UserUnlock(context.Context, *pb.UserUnlockRequest) (*pb.Response, error) {
+	return &pb.Response{
+		Error: "Not implemented",
+	}, fmt.Errorf("not implemented")
 }
 
 func (s *server) UserDelete(context.Context, *pb.UserDeleteRequest) (*pb.Response, error) {
+	return &pb.Response{
+		Error: "Not implemented",
+	}, fmt.Errorf("not implemented")
 }
 
 func (s *server) UserChangePassword(context.Context, *pb.UserChangePasswordRequest) (*pb.Response, error) {
+	return &pb.Response{
+		Error: "Not implemented",
+	}, fmt.Errorf("not implemented")
 }
 
 func main() {
