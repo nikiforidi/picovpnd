@@ -13,6 +13,7 @@ import (
 	"github.com/Netflix/go-expect"
 	pb "github.com/anatolio-deb/picovpnd/picovpnd"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 )
 
 var (
@@ -89,14 +90,35 @@ func (s *server) UserChangePassword(context.Context, *pb.UserChangePasswordReque
 }
 
 func main() {
+	// flag.Parse()
+	// lis, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
+	// if err != nil {
+	// 	log.Fatalf("failed to listen: %v", err)
+	// }
+	// s := grpc.NewServer()
+	// pb.RegisterOpenConnectServiceServer(s, &server{})
+	// log.Printf("server listening at %v", lis.Addr())
+	// if err := s.Serve(lis); err != nil {
+	// 	log.Fatalf("failed to serve: %v", err)
+	// }
 	flag.Parse()
+
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
-	s := grpc.NewServer()
+
+	// Create tls based credential.
+	creds, err := credentials.NewServerTLSFromCert()
+	if err != nil {
+		log.Fatalf("failed to create credentials: %v", err)
+	}
+
+	s := grpc.NewServer(grpc.Creds(creds))
+
+	// Register EchoServer on the server.
 	pb.RegisterOpenConnectServiceServer(s, &server{})
-	log.Printf("server listening at %v", lis.Addr())
+
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
