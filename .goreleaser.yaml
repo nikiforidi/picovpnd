@@ -20,7 +20,8 @@ builds:
       - linux
     goarch:
       - amd64
-
+archives:
+  - formats: ['binary']
 nfpms:
   -
     file_name_template: "{{ .PackageName }}_{{ .Os }}_{{ .Arch }}"
