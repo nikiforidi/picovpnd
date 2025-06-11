@@ -16,25 +16,25 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.22'
+          go-version: '1.24'
 
-      - name: Install fpm dependencies
+      - name: Install GoReleaser
         run: |
-          sudo apt-get update
-          sudo apt-get install -y ruby ruby-dev build-essential
-          sudo gem install --no-document fpm
+          go install github.com/goreleaser/goreleaser/v2@latest
 
-      - name: Build Go binary
+      # - name: Build Go binary
+      #   run: |
+      #     go build -o picovpnd ./picovpn_server/main.go
+
+      # - name: Build .deb package
+      #   run: |
+      #     fpm -s dir -t deb -n picovpnd -v "${GITHUB_REF_NAME#v}" ./picovpnd=/usr/bin/picovpnd
+
+      - name: Upload to GitHub Release
         run: |
-          go build -o picovpnd ./picovpn_server/main.go
-
-      - name: Build .deb package
-        run: |
-          fpm -s dir -t deb -n picovpnd -v "${GITHUB_REF_NAME#v}" ./picovpnd=/usr/bin/picovpnd
-
-      - name: Upload .deb to GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: picovpnd_*.deb
+          goreleaser release
+        # with:
+        #   files: picovpnd_*.deb
         env:
           GITHUB_TOKEN: ${{ secrets.PICOVPN_DAEMON }}
+        
