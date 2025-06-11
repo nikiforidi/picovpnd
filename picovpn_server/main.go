@@ -7,8 +7,8 @@ import (
 	"log"
 	"net"
 
+	pb "github.com/anatolio-deb/picovpnd/picovpnd"
 	"google.golang.org/grpc"
-	pb "google.golang.org/grpc/examples/helloworld/helloworld"
 )
 
 var (
@@ -17,13 +17,23 @@ var (
 
 // server is used to implement helloworld.GreeterServer.
 type server struct {
-	pb.UnimplementedGreeterServer
+	pb.OpenConnectServiceServer
 }
 
 // SayHello implements helloworld.GreeterServer
-func (s *server) SayHello(_ context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {
-	log.Printf("Received: %v", in.GetName())
-	return &pb.HelloReply{Message: "Hello " + in.GetName()}, nil
+func (s *server) UserAdd(context.Context, *pb.UserAddRequest) (*pb.Response, error) {
+}
+
+func (s *server) UserLock(context.Context, *pb.UserLockRequest) (*pb.Response, error) {
+}
+
+func (s *server) UserUnlock(context.Context, *pb.UserUnlockRequest) (*pb.Response, error) {
+}
+
+func (s *server) UserDelete(context.Context, *pb.UserDeleteRequest) (*pb.Response, error) {
+}
+
+func (s *server) UserChangePassword(context.Context, *pb.UserChangePasswordRequest) (*pb.Response, error) {
 }
 
 func main() {
@@ -33,7 +43,7 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	s := grpc.NewServer()
-	pb.RegisterGreeterServer(s, &server{})
+	pb.RegisterOpenConnectServiceServer(s, &server{})
 	log.Printf("server listening at %v", lis.Addr())
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
