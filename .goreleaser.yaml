@@ -24,7 +24,7 @@ builds:
       # - darwin
 
 archives:
-  - format: binary
+  - formats: ['deb']
 
 changelog:
   sort: asc
