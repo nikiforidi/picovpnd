@@ -62,11 +62,11 @@ func (s *server) UserAdd(_ context.Context, req *pb.UserAddRequest) (*pb.Respons
 	}, err
 }
 
-func (s *server) UserLock(context.Context, *pb.UserLockRequest) (*pb.Response, error) {
+func (s *server) UserLock(_ context.Context, req *pb.UserLockRequest) (*pb.Response, error) {
+	b, err := exec.Command("ocpasswd", "--lock", req.Username).CombinedOutput()
 	return &pb.Response{
-		Error: "Not implemented",
-	}, fmt.Errorf("not implemented")
-
+		Error: string(b),
+	}, err
 }
 
 func (s *server) UserUnlock(context.Context, *pb.UserUnlockRequest) (*pb.Response, error) {
