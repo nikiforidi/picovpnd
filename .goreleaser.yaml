@@ -23,9 +23,10 @@ builds:
     goarch:
       - amd64
 
-archives:
-  - formats:
-    - deb
+nfpms:
+    formats:
+      - deb
+
 
 # changelog:
 #   sort: asc
