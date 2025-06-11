@@ -4,7 +4,7 @@ option go_package = "github.com/anatolio-deb/picovpnd/picovpnd";
 package helloworld;
 
 // The greeting service definition.
-service Greeter {
+service OpenConnectService {
   // Sends a greeting
   rpc SayHello (HelloRequest) returns (HelloReply) {}
 }
