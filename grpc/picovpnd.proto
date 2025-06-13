@@ -9,11 +9,18 @@ service OpenConnectService {
   rpc UserUnlock (UserUnlockRequest) returns (Response) {}
   rpc UserDelete (UserDeleteRequest) returns (Response) {}
   rpc UserChangePassword (UserChangePasswordRequest) returns (Response) {}
+  rpc GetCertAndKey (AuthenticateRequest) returns (CertAndKeyResponse) {}
+}
+
+message CertAndKeyResponse {
+  string cert = 1;
+  string key = 2;
 }
 
 message UserAddRequest {
   string username = 1;
   string password = 2;
+  string token = 3; // Token for authentication
 }
 
 message Response {
@@ -22,17 +29,28 @@ message Response {
 
 message UserLockRequest {
   string username = 1;
+  string token = 3; // Token for authentication
+
 }
 
 message UserUnlockRequest {
   string username = 1;
+  string token = 3; // Token for authentication
+
 }
 
 message UserDeleteRequest {
   string username = 1;
+  string token = 3; // Token for authentication
+
 }
 
 message UserChangePasswordRequest {
   string username = 1;
   string password = 2;
+  string token = 3; // Token for authentication
+}
+
+message AuthenticateRequest {
+  string token = 1; // Token for authentication
 }

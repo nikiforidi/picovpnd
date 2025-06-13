@@ -5,12 +5,10 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"os"
-	"os/exec"
-	"time"
 
-	"github.com/Netflix/go-expect"
-	pb "github.com/anatolio-deb/picovpnd/picovpnd"
+	"github.com/anatolio-deb/picovpnd/auth"
+	"github.com/anatolio-deb/picovpnd/core"
+	pb "github.com/anatolio-deb/picovpnd/grpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )
@@ -22,53 +20,23 @@ type server struct {
 
 // SayHello implements helloworld.GreeterServer
 func (s *server) UserAdd(_ context.Context, req *pb.UserAddRequest) (*pb.Response, error) {
-	c, err := expect.NewConsole(expect.WithStdout(os.Stdout))
-	if err != nil {
-		return nil, err
-	}
-	defer c.Close()
-
-	cmd := exec.Command("ocpasswd", "-c", "/etc/ocserv/passwd", req.Username)
-	cmd.Stdin = c.Tty()
-	cmd.Stdout = c.Tty()
-	cmd.Stderr = c.Tty()
-
-	err = cmd.Start()
-	if err != nil {
-		return nil, err
-	}
-
-	go func() {
-		c.ExpectString("Enter password:")
-	}()
-
-	time.Sleep(time.Second)
-	c.SendLine(req.Password)
-
-	go func() {
-		c.ExpectString("Re-enter password:")
-	}()
-
-	time.Sleep(time.Second)
-	c.SendLine(req.Password)
-
-	err = cmd.Wait()
+	err := core.UserAdd(req.Username, req.Password)
 	return &pb.Response{
 		Error: err.Error(),
 	}, err
 }
 
 func (s *server) UserLock(_ context.Context, req *pb.UserLockRequest) (*pb.Response, error) {
-	b, err := exec.Command("ocpasswd", "--lock", req.Username).CombinedOutput()
+	err := core.UserLock(req.Username)
 	return &pb.Response{
-		Error: string(b),
+		Error: err.Error(),
 	}, err
 }
 
 func (s *server) UserUnlock(_ context.Context, req *pb.UserUnlockRequest) (*pb.Response, error) {
-	b, err := exec.Command("ocpasswd", "--unlock", req.Username).CombinedOutput()
+	err := core.UserUnlock(req.Username)
 	return &pb.Response{
-		Error: string(b),
+		Error: err.Error(),
 	}, err
 }
 
@@ -84,23 +52,35 @@ func (s *server) UserChangePassword(context.Context, *pb.UserChangePasswordReque
 	}, fmt.Errorf("not implemented")
 }
 
+func GetCertAndKey(ctx context.Context, req *pb.AuthenticateRequest, opts ...grpc.CallOption) (*pb.CertAndKeyResponse, error) {
+	cert, key, err := auth.NewSSLCertAndKey()
+	if err != nil {
+		return nil, fmt.Errorf("failed to generate cert and key: %v", err)
+	}
+	return &pb.CertAndKeyResponse{
+		Cert: cert.Name(),
+		Key:  key.Name(),
+	}, nil
+}
+
 // https://github.com/grpc/grpc-go/blob/master/examples/features/encryption/TLS/server/main.go
 func main() {
+	cert, key, err := auth.NewSSLCertAndKey()
+	if err != nil {
+		log.Fatal(err)
+	}
 	lis, err := net.Listen("tcp", ":50051")
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
 	// Create tls based credential.
-	creds, err := credentials.NewServerTLSFromFile(
-		"/etc/letsencrypt/live/picovpn.ru/fullchain.pem",
-		"/etc/letsencrypt/live/picovpn.ru/privkey.pem",
-	)
+	creds, err := credentials.NewServerTLSFromFile(cert.Name(), key.Name())
 	if err != nil {
 		log.Fatalf("failed to create credentials: %v", err)
 	}
 
-	s := grpc.NewServer(grpc.Creds(creds))
+	s := grpc.NewServer(grpc.Creds(creds), grpc.UnaryInterceptor(auth.HMACAuthInterceptor))
 
 	// Register EchoServer on the server.
 	pb.RegisterOpenConnectServiceServer(s, &server{})
