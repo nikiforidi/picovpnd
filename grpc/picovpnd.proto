@@ -9,12 +9,11 @@ service OpenConnectService {
   rpc UserUnlock (UserUnlockRequest) returns (Response) {}
   rpc UserDelete (UserDeleteRequest) returns (Response) {}
   rpc UserChangePassword (UserChangePasswordRequest) returns (Response) {}
-  rpc GetCertAndKey (AuthenticateRequest) returns (CertAndKeyResponse) {}
+  rpc GetCert (AuthenticateRequest) returns (CertResponse) {}
 }
 
-message CertAndKeyResponse {
+message CertResponse {
   string cert = 1;
-  string key = 2;
 }
 
 message UserAddRequest {

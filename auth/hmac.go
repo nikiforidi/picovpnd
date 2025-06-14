@@ -6,13 +6,12 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
-	"os"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )
 
-var SharedSecret = []byte(os.Getenv("HMAC_SHARED_SECRET"))
+var sharedSecret = []byte("supersecretkey")
 
 func GenerateHMAC(message string, secret []byte) string {
 	mac := hmac.New(sha256.New, secret)
@@ -36,21 +35,12 @@ func HMACAuthInterceptor(
 	if len(ts) == 0 || len(sig) == 0 {
 		return nil, fmt.Errorf("missing auth headers")
 	}
-	expectedSig := GenerateHMAC(ts[0], SharedSecret)
+	expectedSig := GenerateHMAC(ts[0], sharedSecret)
 	if !hmac.Equal([]byte(sig[0]), []byte(expectedSig)) {
 		return nil, fmt.Errorf("invalid signature")
 	}
 	return handler(ctx, req)
 }
-
-// --- gRPC Service Implementation ---
-// type server struct {
-// 	pb.UnimplementedGreeterServer
-// }
-
-// func (s *server) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {
-// 	return &pb.HelloReply{Message: "Hello " + in.Name}, nil
-// }
 
 // --- Client with HMAC Auth ---
 // func grpcClient() {
@@ -86,7 +76,7 @@ func HMACAuthInterceptor(
 // 		if err != nil {
 // 			log.Fatalf("failed to listen: %v", err)
 // 		}
-// 		s := grpc.NewServer(grpc.UnaryInterceptor(HMACAuthInterceptor))
+// 		s := grpc.NewServer(grpc.UnaryInterceptor(hmacAuthInterceptor))
 // 		pb.RegisterGreeterServer(s, &server{})
 // 		log.Println("gRPC server listening on :50051")
 // 		if err := s.Serve(lis); err != nil {

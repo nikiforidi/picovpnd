@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"os"
 
 	"github.com/anatolio-deb/picovpnd/auth"
 	"github.com/anatolio-deb/picovpnd/core"
@@ -18,7 +19,6 @@ type server struct {
 	pb.OpenConnectServiceServer
 }
 
-// SayHello implements helloworld.GreeterServer
 func (s *server) UserAdd(_ context.Context, req *pb.UserAddRequest) (*pb.Response, error) {
 	err := core.UserAdd(req.Username, req.Password)
 	return &pb.Response{
@@ -52,14 +52,21 @@ func (s *server) UserChangePassword(context.Context, *pb.UserChangePasswordReque
 	}, fmt.Errorf("not implemented")
 }
 
-func GetCertAndKey(ctx context.Context, req *pb.AuthenticateRequest, opts ...grpc.CallOption) (*pb.CertAndKeyResponse, error) {
-	cert, key, err := auth.NewSSLCertAndKey()
+func GetCert(ctx context.Context, req *pb.AuthenticateRequest, opts ...grpc.CallOption) (*pb.CertResponse, error) {
+	cert, _, err := auth.NewSSLCertAndKey()
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate cert and key: %v", err)
 	}
-	return &pb.CertAndKeyResponse{
-		Cert: cert.Name(),
-		Key:  key.Name(),
+	certb, err := os.ReadFile(cert.Name())
+	if err != nil {
+		return nil, fmt.Errorf("failed to read cert: %v", err)
+	}
+	// keyb, err := os.ReadFile(key.Name())
+	// if err != nil {
+	// 	return nil, fmt.Errorf("failed to read key: %v", err)
+	// }
+	return &pb.CertResponse{
+		Cert: string(certb),
 	}, nil
 }
 

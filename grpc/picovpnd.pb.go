@@ -21,28 +21,27 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type CertAndKeyResponse struct {
+type CertResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Cert          string                 `protobuf:"bytes,1,opt,name=cert,proto3" json:"cert,omitempty"`
-	Key           string                 `protobuf:"bytes,2,opt,name=key,proto3" json:"key,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *CertAndKeyResponse) Reset() {
-	*x = CertAndKeyResponse{}
+func (x *CertResponse) Reset() {
+	*x = CertResponse{}
 	mi := &file_grpc_picovpnd_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *CertAndKeyResponse) String() string {
+func (x *CertResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*CertAndKeyResponse) ProtoMessage() {}
+func (*CertResponse) ProtoMessage() {}
 
-func (x *CertAndKeyResponse) ProtoReflect() protoreflect.Message {
+func (x *CertResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_grpc_picovpnd_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -54,21 +53,14 @@ func (x *CertAndKeyResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CertAndKeyResponse.ProtoReflect.Descriptor instead.
-func (*CertAndKeyResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use CertResponse.ProtoReflect.Descriptor instead.
+func (*CertResponse) Descriptor() ([]byte, []int) {
 	return file_grpc_picovpnd_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *CertAndKeyResponse) GetCert() string {
+func (x *CertResponse) GetCert() string {
 	if x != nil {
 		return x.Cert
-	}
-	return ""
-}
-
-func (x *CertAndKeyResponse) GetKey() string {
-	if x != nil {
-		return x.Key
 	}
 	return ""
 }
@@ -442,10 +434,9 @@ var File_grpc_picovpnd_proto protoreflect.FileDescriptor
 const file_grpc_picovpnd_proto_rawDesc = "" +
 	"\n" +
 	"\x13grpc/picovpnd.proto\x12\n" +
-	"helloworld\":\n" +
-	"\x12CertAndKeyResponse\x12\x12\n" +
-	"\x04cert\x18\x01 \x01(\tR\x04cert\x12\x10\n" +
-	"\x03key\x18\x02 \x01(\tR\x03key\"^\n" +
+	"helloworld\"\"\n" +
+	"\fCertResponse\x12\x12\n" +
+	"\x04cert\x18\x01 \x01(\tR\x04cert\"^\n" +
 	"\x0eUserAddRequest\x12\x1a\n" +
 	"\busername\x18\x01 \x01(\tR\busername\x12\x1a\n" +
 	"\bpassword\x18\x02 \x01(\tR\bpassword\x12\x14\n" +
@@ -466,7 +457,7 @@ const file_grpc_picovpnd_proto_rawDesc = "" +
 	"\bpassword\x18\x02 \x01(\tR\bpassword\x12\x14\n" +
 	"\x05token\x18\x03 \x01(\tR\x05token\"+\n" +
 	"\x13AuthenticateRequest\x12\x14\n" +
-	"\x05token\x18\x01 \x01(\tR\x05token2\xc7\x03\n" +
+	"\x05token\x18\x01 \x01(\tR\x05token2\xbb\x03\n" +
 	"\x12OpenConnectService\x12=\n" +
 	"\aUserAdd\x12\x1a.helloworld.UserAddRequest\x1a\x14.helloworld.Response\"\x00\x12?\n" +
 	"\bUserLock\x12\x1b.helloworld.UserLockRequest\x1a\x14.helloworld.Response\"\x00\x12C\n" +
@@ -474,8 +465,8 @@ const file_grpc_picovpnd_proto_rawDesc = "" +
 	"UserUnlock\x12\x1d.helloworld.UserUnlockRequest\x1a\x14.helloworld.Response\"\x00\x12C\n" +
 	"\n" +
 	"UserDelete\x12\x1d.helloworld.UserDeleteRequest\x1a\x14.helloworld.Response\"\x00\x12S\n" +
-	"\x12UserChangePassword\x12%.helloworld.UserChangePasswordRequest\x1a\x14.helloworld.Response\"\x00\x12R\n" +
-	"\rGetCertAndKey\x12\x1f.helloworld.AuthenticateRequest\x1a\x1e.helloworld.CertAndKeyResponse\"\x00B+Z)github.com/anatolio-deb/picovpnd/picovpndb\x06proto3"
+	"\x12UserChangePassword\x12%.helloworld.UserChangePasswordRequest\x1a\x14.helloworld.Response\"\x00\x12F\n" +
+	"\aGetCert\x12\x1f.helloworld.AuthenticateRequest\x1a\x18.helloworld.CertResponse\"\x00B+Z)github.com/anatolio-deb/picovpnd/picovpndb\x06proto3"
 
 var (
 	file_grpc_picovpnd_proto_rawDescOnce sync.Once
@@ -491,7 +482,7 @@ func file_grpc_picovpnd_proto_rawDescGZIP() []byte {
 
 var file_grpc_picovpnd_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_grpc_picovpnd_proto_goTypes = []any{
-	(*CertAndKeyResponse)(nil),        // 0: helloworld.CertAndKeyResponse
+	(*CertResponse)(nil),              // 0: helloworld.CertResponse
 	(*UserAddRequest)(nil),            // 1: helloworld.UserAddRequest
 	(*Response)(nil),                  // 2: helloworld.Response
 	(*UserLockRequest)(nil),           // 3: helloworld.UserLockRequest
@@ -506,13 +497,13 @@ var file_grpc_picovpnd_proto_depIdxs = []int32{
 	4, // 2: helloworld.OpenConnectService.UserUnlock:input_type -> helloworld.UserUnlockRequest
 	5, // 3: helloworld.OpenConnectService.UserDelete:input_type -> helloworld.UserDeleteRequest
 	6, // 4: helloworld.OpenConnectService.UserChangePassword:input_type -> helloworld.UserChangePasswordRequest
-	7, // 5: helloworld.OpenConnectService.GetCertAndKey:input_type -> helloworld.AuthenticateRequest
+	7, // 5: helloworld.OpenConnectService.GetCert:input_type -> helloworld.AuthenticateRequest
 	2, // 6: helloworld.OpenConnectService.UserAdd:output_type -> helloworld.Response
 	2, // 7: helloworld.OpenConnectService.UserLock:output_type -> helloworld.Response
 	2, // 8: helloworld.OpenConnectService.UserUnlock:output_type -> helloworld.Response
 	2, // 9: helloworld.OpenConnectService.UserDelete:output_type -> helloworld.Response
 	2, // 10: helloworld.OpenConnectService.UserChangePassword:output_type -> helloworld.Response
-	0, // 11: helloworld.OpenConnectService.GetCertAndKey:output_type -> helloworld.CertAndKeyResponse
+	0, // 11: helloworld.OpenConnectService.GetCert:output_type -> helloworld.CertResponse
 	6, // [6:12] is the sub-list for method output_type
 	0, // [0:6] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
