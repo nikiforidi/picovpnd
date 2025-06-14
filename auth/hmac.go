@@ -11,7 +11,7 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-var sharedSecret = []byte("supersecretkey")
+var SharedSecret = []byte("supersecretkey")
 
 func GenerateHMAC(message string, secret []byte) string {
 	mac := hmac.New(sha256.New, secret)
