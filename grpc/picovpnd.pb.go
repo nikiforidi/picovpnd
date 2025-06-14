@@ -387,7 +387,8 @@ func (x *UserChangePasswordRequest) GetToken() string {
 
 type AuthenticateRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Token         string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"` // Token for authentication
+	Signature     string                 `protobuf:"bytes,1,opt,name=signature,proto3" json:"signature,omitempty"` // Token for authentication
+	Timestamp     string                 `protobuf:"bytes,2,opt,name=timestamp,proto3" json:"timestamp,omitempty"` // Timestamp for the request
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -422,9 +423,16 @@ func (*AuthenticateRequest) Descriptor() ([]byte, []int) {
 	return file_grpc_picovpnd_proto_rawDescGZIP(), []int{7}
 }
 
-func (x *AuthenticateRequest) GetToken() string {
+func (x *AuthenticateRequest) GetSignature() string {
 	if x != nil {
-		return x.Token
+		return x.Signature
+	}
+	return ""
+}
+
+func (x *AuthenticateRequest) GetTimestamp() string {
+	if x != nil {
+		return x.Timestamp
 	}
 	return ""
 }
@@ -455,9 +463,10 @@ const file_grpc_picovpnd_proto_rawDesc = "" +
 	"\x19UserChangePasswordRequest\x12\x1a\n" +
 	"\busername\x18\x01 \x01(\tR\busername\x12\x1a\n" +
 	"\bpassword\x18\x02 \x01(\tR\bpassword\x12\x14\n" +
-	"\x05token\x18\x03 \x01(\tR\x05token\"+\n" +
-	"\x13AuthenticateRequest\x12\x14\n" +
-	"\x05token\x18\x01 \x01(\tR\x05token2\xbb\x03\n" +
+	"\x05token\x18\x03 \x01(\tR\x05token\"Q\n" +
+	"\x13AuthenticateRequest\x12\x1c\n" +
+	"\tsignature\x18\x01 \x01(\tR\tsignature\x12\x1c\n" +
+	"\ttimestamp\x18\x02 \x01(\tR\ttimestamp2\xbb\x03\n" +
 	"\x12OpenConnectService\x12=\n" +
 	"\aUserAdd\x12\x1a.helloworld.UserAddRequest\x1a\x14.helloworld.Response\"\x00\x12?\n" +
 	"\bUserLock\x12\x1b.helloworld.UserLockRequest\x1a\x14.helloworld.Response\"\x00\x12C\n" +

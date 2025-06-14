@@ -51,5 +51,6 @@ message UserChangePasswordRequest {
 }
 
 message AuthenticateRequest {
-  string token = 1; // Token for authentication
+  string signature = 1; // Token for authentication
+  string timestamp = 2; // Timestamp for the request
 }
