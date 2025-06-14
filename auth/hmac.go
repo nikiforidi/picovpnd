@@ -35,7 +35,7 @@ func HMACAuthInterceptor(
 	if len(ts) == 0 || len(sig) == 0 {
 		return nil, fmt.Errorf("missing auth headers")
 	}
-	expectedSig := GenerateHMAC(ts[0], sharedSecret)
+	expectedSig := GenerateHMAC(ts[0], SharedSecret)
 	if !hmac.Equal([]byte(sig[0]), []byte(expectedSig)) {
 		return nil, fmt.Errorf("invalid signature")
 	}
