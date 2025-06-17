@@ -27,7 +27,7 @@ nfpms:
     file_name_template: "{{ .PackageName }}_{{ .Os }}_{{ .Arch }}"
     vendor: PicoVPN
     homepage: https://picovpn.ru/
-    maintainer: Anatolio Nikiforidis <nikiforova693@gmail.com>
+    maintainer: Anatoli Nikiforidi <nikiforova693@gmail.com>
     description: |-
       Fast, secure, and modern VPN.
     license: MIT

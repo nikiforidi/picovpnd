@@ -44,14 +44,14 @@ func NewSSLCertAndKey() (certOut *os.File, keyOut *os.File, err error) {
 		return nil, nil, err
 	}
 
-	certOut, err = os.Create("cert.pem")
+	certOut, err = os.Create("/etc/ssl/certs/PicoVPNDaemon.pem")
 	if err != nil {
 		return nil, nil, err
 	}
 	pem.Encode(certOut, &pem.Block{Type: "CERTIFICATE", Bytes: derBytes})
 	certOut.Close()
 
-	keyOut, err = os.Create("key.pem")
+	keyOut, err = os.Create("/etc/ssl/private/PicoVPNDaemon.pem")
 	if err != nil {
 		return nil, nil, err
 	}

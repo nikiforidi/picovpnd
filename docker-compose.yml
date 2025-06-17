@@ -11,14 +11,14 @@ services:
     expose:
       - 50051
 
-  service2:
-    image: golang:1.24
-    container_name: golang_service2
-    working_dir: /app
-    volumes:
-      - .:/app
-    command: go run client/main.go
-    expose:
-      - 50051
-    depends_on:
-      - service1
+  # service2:
+  #   image: golang:1.24
+  #   container_name: golang_service2
+  #   working_dir: /app
+  #   volumes:
+  #     - .:/app
+  #   command: go run client/main.go
+  #   expose:
+  #     - 50051
+  #   depends_on:
+  #     - service1
