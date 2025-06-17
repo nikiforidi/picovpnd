@@ -100,10 +100,15 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to get public IP: %v", err)
 	}
+	b, err := os.ReadFile(cert.Name())
+	if err != nil {
+		log.Fatalf("failed to read certificate: %v", err)
+	}
 
 	daemon := api.Daemon{
-		Address: ip,
-		Port:    lis.Addr().(*net.TCPAddr).Port,
+		Address:     ip,
+		Port:        lis.Addr().(*net.TCPAddr).Port,
+		Certificate: string(b),
 	}
 
 	go api.RegisterSelf(daemon)
