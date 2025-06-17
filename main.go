@@ -74,15 +74,15 @@ func GetCert(ctx context.Context, req *pb.AuthenticateRequest, opts ...grpc.Call
 
 // https://github.com/grpc/grpc-go/blob/master/examples/features/encryption/TLS/server/main.go
 func main() {
-	daemonPort := os.Getenv("DAEMON_PORT")
 	cert, key, err := auth.NewSSLCertAndKey()
 	if err != nil {
 		log.Fatal(err)
 	}
-	lis, err := net.Listen("tcp", ":"+daemonPort)
+	lis, err := net.Listen("tcp", ":0")
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
+	log.Printf("listening on %s", lis.Addr().String())
 
 	// Create tls based credential.
 	creds, err := credentials.NewServerTLSFromFile(cert.Name(), key.Name())
@@ -100,15 +100,10 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to get public IP: %v", err)
 	}
-	b, err := os.ReadFile(cert.Name())
-	if err != nil {
-		log.Fatalf("failed to read certificate: %v", err)
-	}
 
 	daemon := api.Daemon{
-		Address:     ip,
-		Port:        daemonPort,
-		Certificate: string(b),
+		Address: ip,
+		Port:    lis.Addr().(*net.TCPAddr).Port,
 	}
 
 	go api.RegisterSelf(daemon)
