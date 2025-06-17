@@ -20,7 +20,7 @@ func RegisterSelf(daemon Daemon) {
 		return
 	}
 
-	resp, err := http.Post("https://picovpn.ru/api/daemon", "application/json", bytes.NewBuffer(b))
+	resp, err := http.Post("https://picovpn.ru/api/daemons", "application/json", bytes.NewBuffer(b))
 	if err != nil {
 		log.Println("failed to send request:", err)
 		return
