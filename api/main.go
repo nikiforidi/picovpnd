@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"time"
+	"os"
 )
 
 type Daemon struct {
@@ -15,46 +15,35 @@ type Daemon struct {
 }
 
 func RegisterSelf(daemon Daemon) {
-	status := 0
-	for status != http.StatusOK {
-		// This function would typically register the daemon with a service registry
-		// or perform some initialization logic.
-		// For now, we will just return nil to indicate success.
-		b, err := json.Marshal(daemon)
-		if err != nil {
-			break
-		}
-
-		// caCert, err := os.ReadFile("/etc/ssl/certs/PicoVPNAPI.pem")
-		// if err != nil {
-		// 	break
-		// }
-		// caCertPool := x509.NewCertPool()
-		// caCertPool.AppendCertsFromPEM(caCert)
-
-		// client := &http.Client{
-		// 	Transport: &http.Transport{
-		// 		TLSClientConfig: &tls.Config{
-		// 			RootCAs: caCertPool,
-		// 		},
-		// 	},
-		// }
-		// client := http.Client{
-		// 	Transport: &http.Transport{
-		// 		TLSClientConfig: &tls.Config{
-		// 			InsecureSkipVerify: true, // Skip verification for self-signed certs
-		// 			// RootCAs: caCertPool, // Uncomment if you have a CA cert pool
-		// 		},
-		// 	},
-		// }
-
-		resp, err := http.Post("https://picovpn.ru/api/daemon", "application/json", bytes.NewBuffer(b))
-		if err != nil {
-			log.Println("failed to register daemon:", err)
-			time.Sleep(5 * time.Second) // Retry after 5 seconds
-		} else if resp.StatusCode != http.StatusOK {
-			break
-		}
+	b, err := json.Marshal(daemon)
+	if err != nil {
+		log.Println("failed to marshal daemon:", err)
+		return
 	}
-	// defer resp.Body.Close()
+
+	req, err := http.NewRequest("POST", "https://picovpn.ru/api/daemon", bytes.NewBuffer(b))
+	if err != nil {
+		log.Println("failed to create request:", err)
+		return
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+
+	token := os.Getenv("TELEGRAM_BOT_TOKEN")
+	if token != "" {
+		req.Header.Set("Authorization", "Bearer "+token)
+	}
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Println("failed to send request:", err)
+		return
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		log.Printf("failed to register daemon, status code: %d\n", resp.StatusCode)
+		return
+	}
+
 }
