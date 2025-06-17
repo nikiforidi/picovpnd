@@ -7,9 +7,11 @@ import (
 	"net"
 	"os"
 
+	"github.com/anatolio-deb/picovpnd/api"
 	"github.com/anatolio-deb/picovpnd/auth"
 	"github.com/anatolio-deb/picovpnd/core"
 	pb "github.com/anatolio-deb/picovpnd/grpc"
+	"github.com/anatolio-deb/picovpnd/ip"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )
@@ -72,11 +74,12 @@ func GetCert(ctx context.Context, req *pb.AuthenticateRequest, opts ...grpc.Call
 
 // https://github.com/grpc/grpc-go/blob/master/examples/features/encryption/TLS/server/main.go
 func main() {
+	daemonPort := os.Getenv("DAEMON_PORT")
 	cert, key, err := auth.NewSSLCertAndKey()
 	if err != nil {
 		log.Fatal(err)
 	}
-	lis, err := net.Listen("tcp", ":50051")
+	lis, err := net.Listen("tcp", ":"+daemonPort)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
@@ -92,6 +95,23 @@ func main() {
 
 	// Register EchoServer on the server.
 	pb.RegisterOpenConnectServiceServer(s, &server{})
+
+	ip, err := ip.GetPublicIP()
+	if err != nil {
+		log.Fatalf("failed to get public IP: %v", err)
+	}
+	b, err := os.ReadFile(cert.Name())
+	if err != nil {
+		log.Fatalf("failed to read certificate: %v", err)
+	}
+
+	daemon := api.Daemon{
+		Address:     ip,
+		Port:        daemonPort,
+		Certificate: string(b),
+	}
+
+	go api.RegisterSelf(daemon)
 
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
