@@ -76,7 +76,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	lis, err := net.Listen("tcp", ":50051")
+	lis, err := net.Listen("tcp", "service1:50051")
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
@@ -87,7 +87,8 @@ func main() {
 		log.Fatalf("failed to create credentials: %v", err)
 	}
 
-	s := grpc.NewServer(grpc.Creds(creds), grpc.UnaryInterceptor(auth.HMACAuthInterceptor))
+	// s := grpc.NewServer(grpc.Creds(creds), grpc.UnaryInterceptor(auth.HMACAuthInterceptor))
+	s := grpc.NewServer(grpc.Creds(creds))
 
 	// Register EchoServer on the server.
 	pb.RegisterOpenConnectServiceServer(s, &server{})

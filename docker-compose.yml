@@ -1,0 +1,24 @@
+version: "3.8"
+
+services:
+  service1:
+    image: golang:1.24
+    container_name: golang_service1
+    working_dir: /app
+    volumes:
+      - .:/app
+    command: go run main.go
+    expose:
+      - 50051
+
+  service2:
+    image: golang:1.24
+    container_name: golang_service2
+    working_dir: /app
+    volumes:
+      - .:/app
+    command: go run client/main.go
+    expose:
+      - 50051
+    depends_on:
+      - service1
