@@ -18,35 +18,38 @@ type Daemon struct {
 }
 
 func RegisterSelf(daemon Daemon) {
-	// This function would typically register the daemon with a service registry
-	// or perform some initialization logic.
-	// For now, we will just return nil to indicate success.
-	b, err := json.Marshal(daemon)
-	if err != nil {
-		panic("failed to marshal daemon: " + err.Error())
-	}
+	status := 0
+	for status != http.StatusOK {
+		// This function would typically register the daemon with a service registry
+		// or perform some initialization logic.
+		// For now, we will just return nil to indicate success.
+		b, err := json.Marshal(daemon)
+		if err != nil {
+			break
+		}
 
-	caCert, err := os.ReadFile("/etc/ssl/certs/PicoVPNAPI.pem")
-	if err != nil {
-		panic("failed to read CA certificate: " + err.Error())
-	}
-	caCertPool := x509.NewCertPool()
-	caCertPool.AppendCertsFromPEM(caCert)
+		caCert, err := os.ReadFile("/etc/ssl/certs/PicoVPNAPI.pem")
+		if err != nil {
+			break
+		}
+		caCertPool := x509.NewCertPool()
+		caCertPool.AppendCertsFromPEM(caCert)
 
-	client := &http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{
-				RootCAs: caCertPool,
+		client := &http.Client{
+			Transport: &http.Transport{
+				TLSClientConfig: &tls.Config{
+					RootCAs: caCertPool,
+				},
 			},
-		},
-	}
+		}
 
-	resp, err := client.Post("https://picovpn.ru/api/daemon", "application/json", bytes.NewBuffer(b))
-	if err != nil {
-		log.Println("failed to register daemon:", err)
-		time.Sleep(5 * time.Second) // Retry after 5 seconds
-	} else if resp.StatusCode != http.StatusOK {
-		panic("failed to register daemon: " + resp.Status)
+		resp, err := client.Post("https://picovpn.ru/api/daemon", "application/json", bytes.NewBuffer(b))
+		if err != nil {
+			log.Println("failed to register daemon:", err)
+			time.Sleep(5 * time.Second) // Retry after 5 seconds
+		} else if resp.StatusCode != http.StatusOK {
+			break
+		}
 	}
 	// defer resp.Body.Close()
 }
