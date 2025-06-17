@@ -2,12 +2,9 @@ package api
 
 import (
 	"bytes"
-	"crypto/tls"
-	"crypto/x509"
 	"encoding/json"
 	"log"
 	"net/http"
-	"os"
 	"time"
 )
 
@@ -28,22 +25,30 @@ func RegisterSelf(daemon Daemon) {
 			break
 		}
 
-		caCert, err := os.ReadFile("/etc/ssl/certs/PicoVPNAPI.pem")
-		if err != nil {
-			break
-		}
-		caCertPool := x509.NewCertPool()
-		caCertPool.AppendCertsFromPEM(caCert)
+		// caCert, err := os.ReadFile("/etc/ssl/certs/PicoVPNAPI.pem")
+		// if err != nil {
+		// 	break
+		// }
+		// caCertPool := x509.NewCertPool()
+		// caCertPool.AppendCertsFromPEM(caCert)
 
-		client := &http.Client{
-			Transport: &http.Transport{
-				TLSClientConfig: &tls.Config{
-					RootCAs: caCertPool,
-				},
-			},
-		}
+		// client := &http.Client{
+		// 	Transport: &http.Transport{
+		// 		TLSClientConfig: &tls.Config{
+		// 			RootCAs: caCertPool,
+		// 		},
+		// 	},
+		// }
+		// client := http.Client{
+		// 	Transport: &http.Transport{
+		// 		TLSClientConfig: &tls.Config{
+		// 			InsecureSkipVerify: true, // Skip verification for self-signed certs
+		// 			// RootCAs: caCertPool, // Uncomment if you have a CA cert pool
+		// 		},
+		// 	},
+		// }
 
-		resp, err := client.Post("https://picovpn.ru/api/daemon", "application/json", bytes.NewBuffer(b))
+		resp, err := http.Post("https://picovpn.ru/api/daemon", "application/json", bytes.NewBuffer(b))
 		if err != nil {
 			log.Println("failed to register daemon:", err)
 			time.Sleep(5 * time.Second) // Retry after 5 seconds
