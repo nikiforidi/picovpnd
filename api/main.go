@@ -26,7 +26,7 @@ func RegisterSelf(daemon Daemon) {
 		panic("failed to marshal daemon: " + err.Error())
 	}
 
-	caCert, err := os.ReadFile("/etc/ssl/certs/PicoVPNDaemon.pem")
+	caCert, err := os.ReadFile("/etc/ssl/certs/PicoVPNAPI.pem")
 	if err != nil {
 		panic("failed to read CA certificate: " + err.Error())
 	}
