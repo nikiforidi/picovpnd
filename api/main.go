@@ -48,5 +48,5 @@ func RegisterSelf(daemon Daemon) {
 	} else if resp.StatusCode != http.StatusOK {
 		panic("failed to register daemon: " + resp.Status)
 	}
-	defer resp.Body.Close()
+	// defer resp.Body.Close()
 }
