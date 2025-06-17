@@ -1,0 +1,11 @@
+[Unit]
+Description=PicoVPN daemon service
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/picovpnd
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
