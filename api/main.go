@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
+	"log"
 	"net/http"
 	"os"
 	"time"
@@ -42,6 +43,7 @@ func RegisterSelf(daemon Daemon) {
 
 	resp, err := client.Post("https://picovpn.ru/api/daemon", "application/json", bytes.NewBuffer(b))
 	if err != nil {
+		log.Println("failed to register daemon:", err)
 		time.Sleep(5 * time.Second) // Retry after 5 seconds
 	} else if resp.StatusCode != http.StatusOK {
 		panic("failed to register daemon: " + resp.Status)
