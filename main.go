@@ -17,8 +17,8 @@ import (
 )
 
 const (
-	certFile = "/et/ssl/certs/cert.pem"
-	keyFile  = "/et/ssl/certs/key.pem"
+	certFile = "/etc/ssl/certs/cert.pem"
+	keyFile  = "/etc/ssl/private/key.pem"
 )
 
 // server is used to implement helloworld.GreeterServer.
