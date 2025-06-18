@@ -83,9 +83,10 @@ func main() {
 	pb.RegisterOpenConnectServiceServer(s, &server{})
 
 	daemon := api.Daemon{
-		Address:     ip,
-		Port:        lis.Addr().(*net.TCPAddr).Port,
-		Certificate: cert,
+		Address: ip,
+		Port:    lis.Addr().(*net.TCPAddr).Port,
+		CertPEM: cert,
+		KeyPem:  key,
 	}
 
 	go api.RegisterSelf(daemon)
