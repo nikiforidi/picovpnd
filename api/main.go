@@ -10,7 +10,7 @@ import (
 type Daemon struct {
 	Address     string `json:"address"`
 	Port        int    `json:"port"`
-	Certificate string `json:"certificate"`
+	Certificate []byte `json:"certificate"`
 }
 
 func RegisterSelf(daemon Daemon) {

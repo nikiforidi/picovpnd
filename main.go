@@ -2,10 +2,10 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
 	"log"
 	"net"
-	"os"
 
 	"github.com/anatolio-deb/picovpnd/api"
 	"github.com/anatolio-deb/picovpnd/auth"
@@ -54,27 +54,13 @@ func (s *server) UserChangePassword(context.Context, *pb.UserChangePasswordReque
 	}, fmt.Errorf("not implemented")
 }
 
-func GetCert(ctx context.Context, req *pb.AuthenticateRequest, opts ...grpc.CallOption) (*pb.CertResponse, error) {
-	cert, _, err := auth.NewSSLCertAndKey()
-	if err != nil {
-		return nil, fmt.Errorf("failed to generate cert and key: %v", err)
-	}
-	certb, err := os.ReadFile(cert.Name())
-	if err != nil {
-		return nil, fmt.Errorf("failed to read cert: %v", err)
-	}
-	// keyb, err := os.ReadFile(key.Name())
-	// if err != nil {
-	// 	return nil, fmt.Errorf("failed to read key: %v", err)
-	// }
-	return &pb.CertResponse{
-		Cert: string(certb),
-	}, nil
-}
-
 // https://github.com/grpc/grpc-go/blob/master/examples/features/encryption/TLS/server/main.go
 func main() {
-	cert, key, err := auth.NewSSLCertAndKey()
+	ip, err := ip.GetPublicIP()
+	if err != nil {
+		log.Fatalf("failed to get public IP: %v", err)
+	}
+	cert, key, err := auth.GenerateSelfSignedCert(ip)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -85,7 +71,10 @@ func main() {
 	log.Printf("listening on %s", lis.Addr().String())
 
 	// Create tls based credential.
-	creds, err := credentials.NewServerTLSFromFile(cert.Name(), key.Name())
+	creds := credentials.NewServerTLSFromCert(&tls.Certificate{
+		Certificate: [][]byte{cert},
+		PrivateKey:  key,
+	})
 	if err != nil {
 		log.Fatalf("failed to create credentials: %v", err)
 	}
@@ -96,19 +85,10 @@ func main() {
 	// Register EchoServer on the server.
 	pb.RegisterOpenConnectServiceServer(s, &server{})
 
-	ip, err := ip.GetPublicIP()
-	if err != nil {
-		log.Fatalf("failed to get public IP: %v", err)
-	}
-	b, err := os.ReadFile(cert.Name())
-	if err != nil {
-		log.Fatalf("failed to read certificate: %v", err)
-	}
-
 	daemon := api.Daemon{
 		Address:     ip,
 		Port:        lis.Addr().(*net.TCPAddr).Port,
-		Certificate: string(b),
+		Certificate: cert,
 	}
 
 	go api.RegisterSelf(daemon)
