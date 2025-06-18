@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"crypto/tls"
 	"fmt"
 	"log"
 	"net"
@@ -71,10 +70,8 @@ func main() {
 	log.Printf("listening on %s", lis.Addr().String())
 
 	// Create tls based credential.
-	creds := credentials.NewServerTLSFromCert(&tls.Certificate{
-		Certificate: [][]byte{cert},
-		PrivateKey:  key,
-	})
+	parsedCert, err := auth.ParseCertAndKey(cert, key)
+	creds := credentials.NewServerTLSFromCert(&parsedCert)
 	if err != nil {
 		log.Fatalf("failed to create credentials: %v", err)
 	}

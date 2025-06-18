@@ -4,6 +4,7 @@ import (
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
+	"crypto/tls"
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/pem"
@@ -53,15 +54,7 @@ func GenerateSelfSignedCert(commonName string) ([]byte, []byte, error) {
 	return certPEM, keyPEM, nil
 }
 
-// ParseCertificate parses a PEM-encoded certificate and returns the x509.Certificate.
-func ParseCertificate(certPEM []byte) (*x509.Certificate, error) {
-	block, _ := pem.Decode(certPEM)
-	if block == nil || block.Type != "CERTIFICATE" {
-		return nil, x509.CertificateInvalidError{}
-	}
-	cert, err := x509.ParseCertificate(block.Bytes)
-	if err != nil {
-		return nil, err
-	}
-	return cert, nil
+// ParseCertAndKey parses PEM-encoded certificate and key into a tls.Certificate.
+func ParseCertAndKey(certPEM, keyPEM []byte) (tls.Certificate, error) {
+	return tls.X509KeyPair(certPEM, keyPEM)
 }
