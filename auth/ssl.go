@@ -4,57 +4,75 @@ import (
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
-	"crypto/tls"
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/pem"
 	"math/big"
+	"os"
 	"time"
 )
 
-// GenerateSelfSignedCert generates a self-signed certificate and private key.
-// Returns certPEM, keyPEM, or an error.
-func GenerateSelfSignedCert(commonName string) ([]byte, []byte, error) {
+func GenerateSelfSignedCert(certFile, keyFile string) error {
 	priv, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 	if err != nil {
-		return nil, nil, err
+		return err
 	}
 
 	serialNumber, err := rand.Int(rand.Reader, new(big.Int).Lsh(big.NewInt(1), 128))
 	if err != nil {
-		return nil, nil, err
+		return err
 	}
 
 	template := x509.Certificate{
 		SerialNumber: serialNumber,
 		Subject: pkix.Name{
-			CommonName: commonName,
+			Organization: []string{"PicoVPN"},
 		},
 		NotBefore: time.Now(),
 		NotAfter:  time.Now().Add(365 * 24 * time.Hour),
 
 		KeyUsage:              x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature,
-		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth, x509.ExtKeyUsageClientAuth},
+		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 		BasicConstraintsValid: true,
 	}
 
 	derBytes, err := x509.CreateCertificate(rand.Reader, &template, &template, &priv.PublicKey, priv)
 	if err != nil {
-		return nil, nil, err
+		return err
 	}
 
-	certPEM := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: derBytes})
-
-	keyBytes, err := x509.MarshalECPrivateKey(priv)
+	certOut, err := os.Create(certFile)
 	if err != nil {
-		return nil, nil, err
+		return err
 	}
-	keyPEM := pem.EncodeToMemory(&pem.Block{Type: "EC PRIVATE KEY", Bytes: keyBytes})
+	defer certOut.Close()
+	if err := pem.Encode(certOut, &pem.Block{Type: "CERTIFICATE", Bytes: derBytes}); err != nil {
+		return err
+	}
 
-	return certPEM, keyPEM, nil
+	keyOut, err := os.Create(keyFile)
+	if err != nil {
+		return err
+	}
+	defer keyOut.Close()
+	b, err := x509.MarshalECPrivateKey(priv)
+	if err != nil {
+		return err
+	}
+	if err := pem.Encode(keyOut, &pem.Block{Type: "EC PRIVATE KEY", Bytes: b}); err != nil {
+		return err
+	}
+
+	return nil
 }
-
-// ParseCertAndKey parses PEM-encoded certificate and key into a tls.Certificate.
-func ParseCertAndKey(certPEM, keyPEM []byte) (tls.Certificate, error) {
-	return tls.X509KeyPair(certPEM, keyPEM)
+func LoadCertPoolFromFile(certFile string) (*x509.CertPool, error) {
+	certPEM, err := os.ReadFile(certFile)
+	if err != nil {
+		return nil, err
+	}
+	certPool := x509.NewCertPool()
+	if !certPool.AppendCertsFromPEM(certPEM) {
+		return nil, err
+	}
+	return certPool, nil
 }

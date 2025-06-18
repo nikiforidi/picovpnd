@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"os"
 
 	"github.com/anatolio-deb/picovpnd/api"
 	"github.com/anatolio-deb/picovpnd/auth"
@@ -13,6 +14,11 @@ import (
 	"github.com/anatolio-deb/picovpnd/ip"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
+)
+
+const (
+	certFile = "/et/ssl/certs/cert.pem"
+	keyFile  = "/et/ssl/certs/key.pem"
 )
 
 // server is used to implement helloworld.GreeterServer.
@@ -59,7 +65,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to get public IP: %v", err)
 	}
-	cert, key, err := auth.GenerateSelfSignedCert(ip)
+	err = auth.GenerateSelfSignedCert(certFile, keyFile)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -70,8 +76,7 @@ func main() {
 	log.Printf("listening on %s", lis.Addr().String())
 
 	// Create tls based credential.
-	parsedCert, err := auth.ParseCertAndKey(cert, key)
-	creds := credentials.NewServerTLSFromCert(&parsedCert)
+	creds, err := credentials.NewServerTLSFromFile(certFile, keyFile)
 	if err != nil {
 		log.Fatalf("failed to create credentials: %v", err)
 	}
@@ -82,11 +87,16 @@ func main() {
 	// Register EchoServer on the server.
 	pb.RegisterOpenConnectServiceServer(s, &server{})
 
+	certPEM, err := os.ReadFile(certFile)
+	if err != nil {
+		log.Fatalf("failed to read cert file: %v", err)
+	}
+
 	daemon := api.Daemon{
 		Address: ip,
 		Port:    lis.Addr().(*net.TCPAddr).Port,
-		CertPEM: cert,
-		KeyPem:  key,
+		CertPEM: certPEM,
+		// KeyPem:  key,
 	}
 
 	go api.RegisterSelf(daemon)
