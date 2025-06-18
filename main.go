@@ -65,7 +65,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to get public IP: %v", err)
 	}
-	err = auth.GenerateSelfSignedCert(certFile, keyFile)
+	err = auth.GenerateSelfSignedCert(certFile, keyFile, []string{ip})
 	if err != nil {
 		log.Fatal(err)
 	}

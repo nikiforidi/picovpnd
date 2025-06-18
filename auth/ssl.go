@@ -8,11 +8,12 @@ import (
 	"crypto/x509/pkix"
 	"encoding/pem"
 	"math/big"
+	"net"
 	"os"
 	"time"
 )
 
-func GenerateSelfSignedCert(certFile, keyFile string) error {
+func GenerateSelfSignedCert(certFile, keyFile string, ipAddresses []string) error {
 	priv, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 	if err != nil {
 		return err
@@ -21,6 +22,14 @@ func GenerateSelfSignedCert(certFile, keyFile string) error {
 	serialNumber, err := rand.Int(rand.Reader, new(big.Int).Lsh(big.NewInt(1), 128))
 	if err != nil {
 		return err
+	}
+
+	var ips []net.IP
+	for _, ipStr := range ipAddresses {
+		ip := net.ParseIP(ipStr)
+		if ip != nil {
+			ips = append(ips, ip)
+		}
 	}
 
 	template := x509.Certificate{
@@ -34,6 +43,7 @@ func GenerateSelfSignedCert(certFile, keyFile string) error {
 		KeyUsage:              x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature,
 		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 		BasicConstraintsValid: true,
+		IPAddresses:           ips,
 	}
 
 	derBytes, err := x509.CreateCertificate(rand.Reader, &template, &template, &priv.PublicKey, priv)
