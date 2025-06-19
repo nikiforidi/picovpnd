@@ -5,15 +5,10 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"os"
 
-	"github.com/anatolio-deb/picovpnd/api"
-	"github.com/anatolio-deb/picovpnd/auth"
 	"github.com/anatolio-deb/picovpnd/core"
 	pb "github.com/anatolio-deb/picovpnd/grpc"
-	"github.com/anatolio-deb/picovpnd/ip"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
 )
 
 const (
@@ -67,45 +62,45 @@ func (s *server) UserChangePassword(context.Context, *pb.UserChangePasswordReque
 
 // https://github.com/grpc/grpc-go/blob/master/examples/features/encryption/TLS/server/main.go
 func main() {
-	ip, err := ip.GetPublicIP()
-	if err != nil {
-		log.Fatalf("failed to get public IP: %v", err)
-	}
-	err = auth.GenerateSelfSignedCert(certFile, keyFile, []string{ip})
-	if err != nil {
-		log.Fatal(err)
-	}
-	lis, err := net.Listen("tcp", ":0")
+	// ip, err := ip.GetPublicIP()
+	// if err != nil {
+	// 	log.Fatalf("failed to get public IP: %v", err)
+	// }
+	// err = auth.GenerateSelfSignedCert(certFile, keyFile, []string{ip})
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	lis, err := net.Listen("tcp", ":5000")
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	log.Printf("listening on %s", lis.Addr().String())
 
 	// Create tls based credential.
-	creds, err := credentials.NewServerTLSFromFile(certFile, keyFile)
-	if err != nil {
-		log.Fatalf("failed to create credentials: %v", err)
-	}
+	// creds, err := credentials.NewServerTLSFromFile(certFile, keyFile)
+	// if err != nil {
+	// 	log.Fatalf("failed to create credentials: %v", err)
+	// }
 
 	// s := grpc.NewServer(grpc.Creds(creds), grpc.UnaryInterceptor(auth.HMACAuthInterceptor))
-	s := grpc.NewServer(grpc.Creds(creds))
+	s := grpc.NewServer()
 
 	// Register EchoServer on the server.
 	pb.RegisterOpenConnectServiceServer(s, &server{})
 
-	certPEM, err := os.ReadFile(certFile)
-	if err != nil {
-		log.Fatalf("failed to read cert file: %v", err)
-	}
+	// certPEM, err := os.ReadFile(certFile)
+	// if err != nil {
+	// 	log.Fatalf("failed to read cert file: %v", err)
+	// }
 
-	daemon := api.Daemon{
-		Address: ip,
-		Port:    lis.Addr().(*net.TCPAddr).Port,
-		CertPEM: certPEM,
-		// KeyPem:  key,
-	}
+	// daemon := api.Daemon{
+	// 	Address: ip,
+	// 	Port:    lis.Addr().(*net.TCPAddr).Port,
+	// 	CertPEM: certPEM,
+	// 	// KeyPem:  key,
+	// }
 
-	go api.RegisterSelf(daemon)
+	// go api.RegisterSelf(daemon)
 
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
