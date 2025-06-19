@@ -27,24 +27,30 @@ type server struct {
 }
 
 func (s *server) UserAdd(_ context.Context, req *pb.UserAddRequest) (*pb.Response, error) {
+	r := &pb.Response{}
 	err := core.UserAdd(req.Username, req.Password)
-	return &pb.Response{
-		Error: err.Error(),
-	}, err
+	if err != nil {
+		r.Error = err.Error()
+	}
+	return r, err
 }
 
 func (s *server) UserLock(_ context.Context, req *pb.UserLockRequest) (*pb.Response, error) {
+	r := &pb.Response{}
 	err := core.UserLock(req.Username)
-	return &pb.Response{
-		Error: err.Error(),
-	}, err
+	if err != nil {
+		r.Error = err.Error()
+	}
+	return r, err
 }
 
 func (s *server) UserUnlock(_ context.Context, req *pb.UserUnlockRequest) (*pb.Response, error) {
+	r := &pb.Response{}
 	err := core.UserUnlock(req.Username)
-	return &pb.Response{
-		Error: err.Error(),
-	}, err
+	if err != nil {
+		r.Error = err.Error()
+	}
+	return r, err
 }
 
 func (s *server) UserDelete(context.Context, *pb.UserDeleteRequest) (*pb.Response, error) {
