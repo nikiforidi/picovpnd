@@ -1,41 +1,18 @@
-name: Build and Release .deb
+#
+name: Create and publish a Docker image
 
+# Configures this workflow to run every time a change is pushed to the branch called `release`.
 on:
   push:
-    tags:
-      - 'v*.*.*'
+    branches: ['release']
 
+# Defines two custom environment variables for the workflow. These are used for the Container registry domain, and a name for the Docker image that this workflow builds.
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+# There is a single job in this workflow. It's configured to run on the latest available version of Ubuntu.
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: '1.24'
-
-      - name: Install GoReleaser
-        run: |
-          go install github.com/goreleaser/goreleaser/v2@latest
-
-      # - name: Build Go binary
-      #   run: |
-      #     go build -o picovpnd ./picovpn_server/main.go
-
-      # - name: Build .deb package
-      #   run: |
-      #     fpm -s dir -t deb -n picovpnd -v "${GITHUB_REF_NAME#v}" ./picovpnd=/usr/bin/picovpnd
-
-      - name: Upload to GitHub Release
-        run: |
-          goreleaser release
-        # with:
-        #   files: picovpnd_*.deb
-        env:
-          GITHUB_TOKEN: ${{ secrets.PICOVPN_DAEMON }}
   build-and-push-image:
     runs-on: ubuntu-latest
     # Sets the permissions granted to the `GITHUB_TOKEN` for the actions in this job.
@@ -81,5 +58,3 @@ jobs:
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
       
-
-        
